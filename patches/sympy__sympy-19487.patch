@@ -1,0 +1,11 @@
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -256,6 +256,9 @@ class sign(Function):
+             return Piecewise((1, arg > 0), (-1, arg < 0), (0, True))
+         return self.func(arg)
+ 
++    def _eval_rewrite_as_Abs(self, arg, **kwargs):
++        return arg / Abs(arg)
++
+     def _eval_simplify(self, **kwargs):
+         return self.func(self.args[0].factor())

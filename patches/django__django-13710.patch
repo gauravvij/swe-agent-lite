@@ -1,0 +1,19 @@
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -2020,9 +2020,15 @@ class InlineModelAdmin(BaseModelAdmin):
+         self.parent_model = parent_model
+         self.opts = self.model._meta
+         if self.verbose_name is None:
+             self.verbose_name = self.model._meta.verbose_name
++            verbose_name_explicitly_set = False
++        else:
++            verbose_name_explicitly_set = True
+         if self.verbose_name_plural is None:
+-            self.verbose_name_plural = self.model._meta.verbose_name_plural
++            if verbose_name_explicitly_set:
++                self.verbose_name_plural = self.verbose_name + 's'
++            else:
++                self.verbose_name_plural = self.model._meta.verbose_name_plural
+         super().__init__()
+ 
+     @property

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.venv
+env/
+venv/
+
+# Large data files
+data/swebench_lite_test.json
+data/checkpoint_plan_solve.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

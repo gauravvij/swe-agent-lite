@@ -1,0 +1,12 @@
+--- a/astropy/io/ascii/rst.py
++++ b/astropy/io/ascii/rst.py
+@@ -46,7 +46,8 @@ class RST(FixedWidth):
+     _format_name = "rst"
+     _description = "reStructuredText simple table"
+ 
+-    def __init__(self, **kwargs):
++    def __init__(self, header_rows=None, **kwargs):
++        kwargs["header_rows"] = header_rows
+         # Set default delimiter to space
+         kwargs.setdefault("delimiter", " ")
+         # Set default padding to 1 space

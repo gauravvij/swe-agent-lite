@@ -1,0 +1,56 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -840,6 +840,9 @@ class Model(six.with_metaclass(ModelBase)):
+         return getattr(self, field.attname)
+ 
+     def _get_FIELD_display(self, field):
++        # Look up the field on the instance's class to handle inherited
++        # choices correctly.
++        field = self._meta.get_field(field.name)
+         value = getattr(self, field.attname)
+         return force_text(dict(field.flatchoices).get(value, value), strings_only=True)
+ 
+diff --git a/tests/model_inheritance/tests.py b/tests/model_inheritance/tests.py
+--- a/tests/model_inheritance/tests.py
++++ b/tests/model_inheritance/tests.py
+@@ -1,6 +1,7 @@
+ from __future__ import unicode_literals
+ 
+ from django.db import connection, models
++from django.test import isolate_apps
+ from django.test import TestCase
+ 
+ from .models import (
+@@ -12,6 +13,28 @@ from .models import (
+ )
+ 
+ 
++@isolate_apps('model_inheritance')
++class InheritedChoicesTests(TestCase):
++    def test_inherited_choices_display(self):
++        """
++        get_FOO_display() works correctly when a child model overrides
++        the choices of a field inherited from an abstract parent.
++        """
++        class AbstractBaseModel(models.Model):
++            foo_choice = [("A", "output1"), ("B", "output2")]
++            field_foo = models.CharField(max_length=254, choices=foo_choice)
++            
++            class Meta:
++                abstract = True
++        
++        class ChildModel(AbstractBaseModel):
++            foo_choice = [("A", "output1"), ("B", "output2"), ("C", "output3")]
++            field_foo = models.CharField(max_length=254, choices=foo_choice)
++            
++            class Meta:
++                app_label = 'model_inheritance'
++        
++        obj = ChildModel(field_foo="C")
++        self.assertEqual(obj.get_field_foo_display(), "output3")
++
++
+ class ModelInheritanceTests(TestCase):
+     def test_model_inheritance(self):
+         # The Student and Worker models both have 'name' and 'age' fields on

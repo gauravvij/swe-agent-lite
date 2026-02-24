@@ -1,0 +1,9 @@
+diff --git a/django/db/models/sql/subqueries.py b/django/db/models/sql/subqueries.py
+index abc123..def456 100644
+--- a/django/db/models/sql/subqueries.py
++++ b/django/db/models/sql/subqueries.py
+@@ -115,8 +115,8 @@ class InsertQuery(Query):
+         for obj in objs:
+             self.objs.append(obj)
+         self.ignore_conflicts = ignore_conflicts
+         self

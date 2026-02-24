@@ -1,0 +1,14 @@
+--- a/sympy/printing/mathml.py
++++ b/sympy/printing/mathml.py
+@@ -358,6 +358,16 @@ class MathMLPrinter(Printer):
+         for arg in e:
+             x.appendChild(self._print(arg))
+         return x
++
++    def _print_Indexed(self, e):
++        x = self.dom.createElement('apply')
++        x.appendChild(self.dom.createElement('selector'))
++        x.appendChild(self._print(e.base))
++        for index in e.indices:
++            x.appendChild(self._print(index))
++        return x

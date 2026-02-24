@@ -1,0 +1,11 @@
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -42,8 +42,6 @@ def expand_modules(files_or_modules, black_list, black_list_re):
+             continue
+         module_path = os.path.realpath(something)
+         if os.path.isdir(module_path):
+-            if not os.path.exists(os.path.join(module_path, "__init__.py")):
+-                continue
+             module_name = os.path.basename(module_path)
+         else:
+             module_name = os.path.splitext(os.path.basename(module_path))[0]

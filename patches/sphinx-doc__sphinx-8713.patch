@@ -1,0 +1,36 @@
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -708,8 +708,12 @@ class NumpyDocstring(GoogleDocstring):
+         return self._format_fields(_('Returns'), fields)
+ 
+     def _parse_other_parameters_section(self, section: str) -> List[str]:
+-        return self._format_fields(_('Other Parameters'), self._consume_fields())
++        fields = self._consume_fields()
++        if self._config.napoleon_use_param:
++            return self._format_docutils_params(fields)
++        else:
++            return self._format_fields(_('Other Parameters'), fields)
+ 
+     def _parse_parameters_section(self, section: str) -> List[str]:
+         fields = self._consume_fields()
+--- a/tests/test_ext_napoleon_docstring.py
++++ b/tests/test_ext_napoleon_docstring.py
+@@ -1234,3 +1234,18 @@ class InlineAttributeTest(BaseDocstringTest):
+         config = Config()
+         docstring = """data with ``a : in code`` and :ref:`reference` a
+ """
++
++
++class TestOtherParametersUseParam(BaseDocstringTest):
++    def test_numpy_other_parameters_use_param(self):
++        config = Config(napoleon_use_param=True)
++        docstring = NumpyDocstring("""
++        Other Parameters
++        ----------------
++        y : float
++            Description of y
++        """, config)
++        result = str(docstring)
++        assert ':param y:' in result
++        assert ':type y:' in result
++        assert ':param x:' not in result

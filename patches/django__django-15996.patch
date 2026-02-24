@@ -1,0 +1,65 @@
+diff --git a/django/db/migrations/serializer.py b/django/db/migrations/serializer.py
+index 123456..789abc 100644
+--- a/django/db/migrations/serializer.py
++++ b/django/db/migrations/serializer.py
+@@ -114,9 +114,26 @@ class EnumSerializer(BaseSerializer):
+ 
+     def serialize(self):
+         enum_class = self.value.__class__
+-        return "%s.%s" % (enum_class.__name__, self.value.name), {
+-            "import %s" % enum_class.__module__,
+-        }
++        if self.value.name is not None:
++            return "%s.%s" % (enum_class.__name__, self.value.name), {
++                "import %s" % enum_class.__module__,
++            }
++        # Handle combined enum flags (e.g., re.UNICODE | re.IGNORECASE)
++        members = []
++        seen_values = set()
++        for name, member in enum_class.__members__.items():
++            if member.value and member.value not in seen_values:
++                if member.value & self.value.value == member.value:
++                    members.append((member.value, "%s.%s" % (enum_class.__name__, name)))
++                    seen_values.add(member.value)
++        if members:
++            # Sort by value to ensure consistent output
++            members.sort()
++            return " | ".join(m[1] for m in members), {"import %s" % enum_class.__module__}
++        # Fallback for zero or unrecognized values
++        return "%s(%r)" % (enum_class.__name__, self.value.value), {
++            "import %s" % enum_class.__module__,
++        }
+ 
+ 
+ class FloatSerializer(BaseSerializer):
+diff --git a/tests/migrations/test_writer.py b/tests/migrations/test_writer.py
+index 123456..789abc 100644
+--- a/tests/migrations/test_writer.py
++++ b/tests/migrations/test_writer.py
+@@ -123,6 +123,24 @@ class MigrationWriterTests(SimpleTestCase):
+         self.assertSerializedResultEqual(
+             TextChoicesEnum.B, ("migrations.test_writer.TextChoicesEnum.B", {"import migrations.test_writer"})
+         )
++    
++    def test_serialize_enum_flags(self):
++        """Test serialization of enum IntFlag combinations."""
++        # Test simple enum flag
++        self.assertSerializedResultEqual(
++            re.RegexFlag.UNICODE, ("re.RegexFlag.UNICODE", {"import re"})
++        )
++        # Test combined enum flags
++        combined = re.RegexFlag.UNICODE | re.RegexFlag.IGNORECASE
++        result = MigrationWriter.serialize(combined)
++        self.assertEqual(result[1], {"import re"})
++        # Result should be the two flags ORed together (order may vary by value)
++        self.assertIn(result[0], [
++            "re.RegexFlag.IGNORECASE | re.RegexFlag.UNICODE",
++            "re.RegexFlag.UNICODE | re.RegexFlag.IGNORECASE",
++        ])
++        # Test zero value
++        self.assertSerializedResultEqual(
++            re.RegexFlag(0), ("re.RegexFlag(0)", {"import re"})
++        )
+ 
+     def test_serialize_function(self):
+         with self.assertRaisesMessage(ValueError, "Cannot serialize function: lambda"):

@@ -1,0 +1,146 @@
+--- a/astropy/io/ascii/qdp.py
++++ b/astropy/io/ascii/qdp.py
+@@ -115,7 +115,7 @@ def _line_type(line, table_id=None):
+     if line.startswith("!"):
+         return "comment"
+     tokens = line.strip().split()
+-    if tokens[0] in _VALID_CMDS:
++    if tokens[0].upper() in _VALID_CMDS:
+         return "command"
+     if tokens[0] == "NO":
+         # NO is a valid command but NO[RT] are not (they are errors)
+@@ -123,7 +123,7 @@ def _line_type(line, table_id=None):
+             return "command"
+         return "data"
+     for possible_command in _VALID_CMDS:
+-        if line.strip().startswith(possible_command):
++        if line.strip().upper().startswith(possible_command):
+             return "command"
+     return "data"
+ 
+@@ -145,7 +145,7 @@ def _interpret_command_line(line):
+     """
+     command = None
+     for val in _VALID_CMDS:
+-        if line.startswith(val):
++        if line.upper().startswith(val):
+             command = val
+             break
+     if command is None:
+@@ -153,7 +153,7 @@ def _interpret_command_line(line):
+             "This should not happen. Please report!"
+         )
+ 
+-    if line.startswith("READ"):
++    if line.upper().startswith("READ"):
+         # line = 'READ SERR 1 2'
+         # The command is READ, the following are arguments
+         # arguments = 'SERR 1 2'
+@@ -162,7 +162,7 @@ def _interpret_command_line(line):
+         # arguments = ['SERR', '1', '2']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("LINE"):
++    elif line.upper().startswith("LINE"):
+         # line = 'LINE FILL'
+         # The command is LINE, the following are arguments
+         # arguments = 'FILL'
+@@ -171,7 +171,7 @@ def _interpret_command_line(line):
+         # arguments = ['FILL']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("LAB"):
++    elif line.upper().startswith("LAB"):
+         # line = 'LAB 1 X'
+         # The command is LAB, the following are arguments
+         # arguments = '1 X'
+@@ -180,7 +180,7 @@ def _interpret_command_line(line):
+         # arguments = ['1', 'X']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("LOC"):
++    elif line.upper().startswith("LOC"):
+         # line = 'LOC 0.1 0.2 0.3 0.4'
+         # The command is LOC, the following are arguments
+         # arguments = '0.1 0.2 0.3 0.4'
+@@ -189,7 +189,7 @@ def _interpret_command_line(line):
+         # arguments = ['0.1', '0.2', '0.3', '0.4']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("CO"):
++    elif line.upper().startswith("CO"):
+         # line = 'COlor 1 ON'
+         # The command is COlor, the following are arguments
+         # arguments = '1 ON'
+@@ -198,7 +198,7 @@ def _interpret_command_line(line):
+         # arguments = ['1', 'ON']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("CS"):
++    elif line.upper().startswith("CS"):
+         # line = 'CSIZE 1.5'
+         # The command is CSIZE, the following are arguments
+         # arguments = '1.5'
+@@ -207,7 +207,7 @@ def _interpret_command_line(line):
+         # arguments = ['1.5']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("MA"):
++    elif line.upper().startswith("MA"):
+         # line = 'MArker 1 2'
+         # The command is MArker, the following are arguments
+         # arguments = '1 2'
+@@ -216,7 +216,7 @@ def _interpret_command_line(line):
+         # arguments = ['1', '2']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("LI"):
++    elif line.upper().startswith("LI"):
+         # line = 'LIne 1 2'
+         # The command is LIne, the following are arguments
+         # arguments = '1 2'
+@@ -225,7 +225,7 @@ def _interpret_command_line(line):
+         # arguments = ['1', '2']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("T"):
++    elif line.upper().startswith("T"):
+         # line = 'TIme off'
+         # The command is TIme, the following are arguments
+         # arguments = 'off'
+@@ -234,7 +234,7 @@ def _interpret_command_line(line):
+         # arguments = ['off']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("SC"):
++    elif line.upper().startswith("SC"):
+         # line = 'SCale 2'
+         # The command is SCale, the following are arguments
+         # arguments = '2'
+@@ -243,7 +243,7 @@ def _interpret_command_line(line):
+         # arguments = ['2']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("FO"):
++    elif line.upper().startswith("FO"):
+         # line = 'FOnT 2'
+         # The command is FOnT, the following are arguments
+         # arguments = '2'
+@@ -252,7 +252,7 @@ def _interpret_command_line(line):
+         # arguments = ['2']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("NO"):
++    elif line.upper().startswith("NO"):
+         # line = 'NO [arg]'
+         # The command is NO, the following are arguments
+         # arguments = '[arg]'
+@@ -261,7 +261,7 @@ def _interpret_command_line(line):
+         # arguments = ['[arg]']
+         arguments = arguments.split()
+ 
+-    elif line.startswith("MO"):
++    elif line.upper().startswith("MO"):
+         # line = 'MOdel [arg]'
+         # The command is MOdel, the following are arguments
+         # arguments = '[arg]'

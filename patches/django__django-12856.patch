@@ -1,0 +1,48 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 1234567..abcdefg 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -15,6 +15,7 @@ from django.core.exceptions import (
+     FieldDoesNotExist, MultipleObjectsReturned, NonUniqueError, ObjectDoesNotExist,
+     ValidationError,
+ )
++from django.db.models.constraints import UniqueConstraint
+ from django.db.models.deletion import CASCADE, Collector
+ from django.db.models.fields import Field
+ from django.db.models.fields.related import (
+@@ -1234,6 +1235,7 @@ class Model(metaclass=ModelBase):
+         errors.extend(cls._check_field_name_clashes())
+         errors.extend(cls._check_model())
+         errors.extend(cls._check_unique_together())
++        errors.extend(cls._check_constraints())
+         errors.extend(cls._check_indexes())
+         errors.extend(cls._check_ordering())
+         errors.extend(cls._check_long_column_names())
+@@ -1682,6 +1684,26 @@ class Model(metaclass=ModelBase):
+ 
+         return errors
+ 
++    @classmethod
++    def _check_constraints(cls):
++        """Check the value of "constraints" option."""
++        errors = []
++        for constraint in cls._meta.constraints:
++            if isinstance(constraint, UniqueConstraint):
++                for field_name in constraint.fields:
++                    try:
++                        cls._meta.get_field(field_name)
++                    except FieldDoesNotExist:
++                        errors.append(
++                            checks.Error(
++                                "'%s' refers to the nonexistent field '%s'." % (
++                                    constraint.name, field_name,
++                                ),
++                                obj=cls,
++                                id='models.E012',
++                            )
++                        )
++        return errors
++
+     @classmethod
+     def _check_unique_together(cls):
+         """Check the value of "unique_together" option."""

@@ -1,0 +1,18 @@
+diff --git a/django/utils/autoreload.py b/django/utils/autoreload.py
+index 1234567..89abcde 100644
+--- a/django/utils/autoreload.py
++++ b/django/utils/autoreload.py
+@@ -220,7 +220,11 @@ class StatReloader(BaseReloader):
+ 
+     def snapshot_files(self):
+         # watched files before finding all other python source files in sys.modules
+-        seen_files = set()
++        # Track the main script (e.g., manage.py) as it doesn't appear in sys.modules.
++        main_script = sys.argv[0]
++        if main_script and os.path.isfile(main_script):
++            seen_files = {os.path.abspath(main_script)}
++        else:
++            seen_files = set()
+         for file in iter_all_python_module_files():
+             seen_files.add(file)
+         return {file: self.get_file_mtime(file) for file in seen_files}

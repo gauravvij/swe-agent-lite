@@ -1,0 +1,11 @@
+--- a/django/core/management/templates.py
++++ b/django/core/management/templates.py
+@@ -74,7 +74,7 @@ class TemplateCommand(BaseCommand):
+         else:
+             top_dir = os.path.abspath(path.expanduser(target))
+             if not os.path.exists(top_dir):
+-                self.validate_name(os.path.basename(target), 'directory')
++                self.validate_name(os.path.basename(target.rstrip(os.sep)), 'directory')
+                 try:
+                     os.makedirs(top_dir)
+                 except OSError as e:

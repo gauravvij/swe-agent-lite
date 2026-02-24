@@ -1,0 +1,21 @@
+--- a/tests/custom_pk/models.py
++++ b/tests/custom_pk/models.py
+@@ -45,3 +45,19 @@ class Foo(models.Model):
+ 
+ class Foo(models.Model):
+     bar = models.ForeignKey(Bar, models.CASCADE)
++
++
++class FilterableType(models.Model):
++    """Model with a 'filterable' field to test regression for filter lookups."""
++    name = models.CharField(max_length=20)
++    filterable = models.BooleanField(default=False)
++
++    class Meta:
++        ordering = ['name']
++
++
++class RelatedToFilterable(models.Model):
++    """Model that FKs to FilterableType."""
++    name = models.CharField(max_length=20)
++    filterable_type = models.ForeignKey(FilterableType, on_delete=models.CASCADE)

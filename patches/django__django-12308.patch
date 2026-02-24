@@ -1,0 +1,12 @@
+--- a/django/contrib/admin/utils.py
++++ b/django/contrib/admin/utils.py
+@@ -398,6 +398,9 @@ def display_for_field(value, field, empty_value_display):
+         return formats.localize(timezone.template_localtime(value))
+     elif isinstance(field, models.DateField):
+         return formats.localize(value)
++    elif isinstance(field, models.JSONField):
++        form_field = field.formfield()
++        return form_field.prepare_value(value)
+     elif isinstance(field, models.TimeField):
+         return formats.localize(value)
+     elif isinstance(field, (models.DecimalField, models.FloatField)):

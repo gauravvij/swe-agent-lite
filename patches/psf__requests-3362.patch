@@ -1,0 +1,21 @@
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -645,12 +645,13 @@ class Response(object):
+ 
+             self._content_consumed = True
+ 
+-        if decode_unicode:
+-            gen = self._decode_unicode(gen)
+-
+         if self._content_consumed:
+             # simulate reading small chunks of the content
+-            return iter_slices(self._content, chunk_size)
++            gen = iter_slices(self._content, chunk_size)
+         else:
+-            return gen
++            gen = generate()
++
++        if decode_unicode:
++            gen = self._decode_unicode(gen)
++
++        return gen

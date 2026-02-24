@@ -1,0 +1,31 @@
+diff --git a/django/core/management/base.py b/django/core/management/base.py
+index 8e7c4c2e5f..a2b3c4d5e6 100644
+--- a/django/core/management/base.py
++++ b/django/core/management/base.py
+@@ -1,6 +1,7 @@
+ """
+ Base classes for writing management commands (named commands which can be
+ executed through ``django-admin`` or ``manage.py``).
+ """
++import argparse
+ import os
+ import sys
+ from argparse import ArgumentParser
+@@ -100,6 +101,9 @@ class BaseCommand:
+     """
+     # Metadata about this command.
+     help = ''
++    # The formatter class to use for the argument parser.
++    formatter_class = argparse.HelpFormatter
++
+     # Configuration shortcuts that alter various logic.
+     _called_from_command_line = False
+     output_transaction = False
+@@ -200,6 +204,7 @@ class BaseCommand:
+         parser = CommandParser(
+             prog=f"{prog_name} {subcommand}",
+             description=self.help,
++            formatter_class=self.formatter_class,
+             **kwargs
+         )
+         self.add_arguments(parser)

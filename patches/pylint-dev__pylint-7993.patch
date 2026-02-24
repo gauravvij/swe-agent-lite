@@ -1,0 +1,22 @@
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -25,6 +25,7 @@
+ import os
+ import re
+ import sys
++import string
+ import warnings
+ from typing import TYPE_CHECKING, NamedTuple
+ 
+@@ -203,8 +204,10 @@ def check_template(self, template):
+         """Check that the template is valid."""
+         if template is None:
+             return
+-        for match in re.finditer(r"\{([^{}]+)\}", template):
+-            field = match.group(1)
++        for _, field, _, _ in string.Formatter().parse(template):
++            if field is None:
++                continue
+             if field not in self._fields:
+                 warnings.warn(
+                     f"Don't recognize the argument '{field}' in the --msg-template. "

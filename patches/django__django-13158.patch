@@ -1,0 +1,52 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 1234567..abcdefg 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -345,6 +345,7 @@ class Query(BaseExpression):
+     def set_empty(self):
+         self.where = WhereNode(connector=AND)
+         self.where.add(NothingNode(), AND)
++        self.combined_queries = ()
+ 
+     def is_empty(self):
+         return any(isinstance(node, NothingNode) for node in self.where.children)
+diff --git a/tests/model_forms/tests.py b/tests/model_forms/tests.py
+index 1234567..abcdefg 100644
+--- a/tests/model_forms/tests.py
++++ b/tests/model_forms/tests.py
+@@ -1923,6 +1923,28 @@ class ModelMultipleChoiceFieldTests(TestCase):
+         self.assertEqual(list(form.cleaned_data['publications']), [self.p1])
+ 
+ 
++class ModelMultipleChoiceFieldUnionTests(TestCase):
++    def test_union_queryset_none(self):
++        """
++        Test that ModelMultipleChoiceField with a union queryset returns
++        an empty queryset when no data is submitted, not all results.
++        """
++        p1 = Publication.objects.create(title='Publication 1')
++        p2 = Publication.objects.create(title='Publication 2')
++        p3 = Publication.objects.create(title='Publication 3')
++
++        class ArticleFormWithUnion(forms.ModelForm):
++            publications = forms.ModelMultipleChoiceField(
++                queryset=Publication.objects.filter(id__lt=p2.id).union(
++                    Publication.objects.filter(id__gt=p2.id)
++                ),
++                required=False,
++            )
++
++            class Meta:
++                model = Article
++                fields = ['publications']
++
++        # Submit form with no publications selected
++        form = ArticleFormWithUnion({'publications': ''})
++        self.assertTrue(form.is_valid())
++        # Should return empty queryset, not all items from union
++        self.assertEqual(list(form.cleaned_data['publications']), [])
++
++
+ class UniqueTest(TestCase):
+     def test_unique(self):
+         title = 'I am a unique title'

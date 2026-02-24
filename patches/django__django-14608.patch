@@ -1,0 +1,22 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -375,7 +375,7 @@ class BaseFormSet:
+             error = ValidationError(
+                 _('ManagementForm data is missing or has been tampered with'),
+                 code='missing_management_form',
+             )
+-            self._non_form_errors = self.error_class(error)
++            self._non_form_errors = self.error_class(error, error_class='errorlist nonform')
+             return
+ 
+         for i in range(0, self.total_form_count()):
+@@ -386,7 +386,7 @@ class BaseFormSet:
+         # Give self.clean() a chance to do cross-form validation.
+         self.clean()
+         if self._non_form_errors is None:
+-            self._non_form_errors = self.error_class()
++            self._non_form_errors = self.error_class(error_class='errorlist nonform')
+ 
+     def clean(self):
+         """

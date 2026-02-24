@@ -1,0 +1,25 @@
+--- a/sympy/core/tests/test_assumptions.py
++++ b/sympy/core/tests/test_assumptions.py
+@@ -1,5 +1,5 @@
+ from sympy import I, sqrt, log, exp, sin, asin, factorial, Mod, pi
+ from sympy.core import Symbol, S, Rational, Integer, Dummy, Wild, Pow
+ from sympy.core.facts import InconsistentAssumptions
+-from sympy import simplify
++from sympy import simplify, ceiling, sympify
+ from sympy.core.compatibility import range
+ 
+ from sympy.utilities.pytest import raises, XFAIL
+@@ -...,... @@
+     assert mm.is_real is True
+     assert mm.is_complex is True
++
++
++def test_ceiling_simplify_consistency():
++    # Test for issue: Inconsistent behavior for sympify/simplify with ceiling
++    x = Symbol('x')
++    expr_eval_false = sympify('4*ceiling(x/4 - 3/4)', evaluate=False)
++    expr_eval_true = sympify('4*ceiling(x/4 - 3/4)', evaluate=True)
++    # Both should give the same result after simplification
++    assert simplify(expr_eval_false) == simplify(expr_eval_true)
++    # Specifically, should not incorrectly distribute the 4 into ceiling
++    assert simplify(expr_eval_false) == 4*ceiling(x/4 - Rational(3,4))

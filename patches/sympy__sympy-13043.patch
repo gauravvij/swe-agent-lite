@@ -1,0 +1,18 @@
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -14,6 +14,7 @@
+ from sympy.core.compatibility import is_sequence
+ from sympy.polys.polytools import Poly, factor_list
+ from sympy.simplify.simplify import nsimplify
++from sympy.utilities import default_sort_key
+ 
+ 
+ def decompose(poly, separate=False):
+@@ -89,7 +90,7 @@ def decompose(poly, separate=False):
+                 poly_dict[key] = [value]
+ 
+     if separate:
+-        return list(poly_dict.values())
++        return sorted(poly_dict.values(), key=default_sort_key)
+     return poly_dict

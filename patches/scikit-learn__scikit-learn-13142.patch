@@ -1,0 +1,25 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -196,7 +196,7 @@ class BaseMixture(six.with_metaclass(ABCMeta, BaseEstimator)):
+     def fit_predict(self, X, y=None):
+         """Fit and predict labels."""
+         self.fit(X)
+-        return self.labels_
++        return self.predict(X)
+ 
+     def predict(self, X):
+         """Predict labels."""
+diff --git a/sklearn/mixture/tests/test_gaussian_mixture.py b/sklearn/mixture/tests/test_gaussian_mixture.py
+--- a/sklearn/mixture/tests/test_gaussian_mixture.py
++++ b/sklearn/mixture/tests/test_gaussian_mixture.py
+@@ -XXX,6 +XXX,13 @@ def test_gaussian_mixture_fit_predict():
+     c1 = gm.fit_predict(X)
+     c2 = gm.predict(X)
+     assert_array_equal(c1, c2)
++
++    # Check fit_predict with n_init > 1
++    gm = GaussianMixture(n_components=5, n_init=5, random_state=0)
++    c1 = gm.fit_predict(X)
++    c2 = gm.predict(X)
++    assert_array_equal(c1, c2)

@@ -1,0 +1,10 @@
+--- a/lib/matplotlib/colorbar.py
++++ b/lib/matplotlib/colorbar.py
+@@ -556,6 +556,8 @@ class Colorbar:
+         self.mappable = mappable
+         self.set_alpha(mappable.get_alpha())
+         self.cmap = mappable.cmap
++        self._inside = None
++        self._outside = None
+         self.norm = mappable.norm
+         self._draw_all()

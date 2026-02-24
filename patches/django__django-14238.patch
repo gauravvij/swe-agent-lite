@@ -1,0 +1,20 @@
+--- a/django/db/models/options.py
++++ b/django/db/models/options.py
+@@ -5,7 +5,7 @@ from django.apps import apps
+ from django.conf import settings
+ from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+ from django.db import connections
+-from django.db.models.fields import AutoField
++from django.db.models.fields import AutoField, BigAutoField, SmallAutoField
+ from django.db.models.fields.related import ForeignObject, ManyToManyField, OneToOneField
+ from django.db.models.fields.related_descriptors import ManyToManyDescriptor
+ from django.db.models.query_utils import PathInfo
+@@ -243,7 +243,7 @@ class Options:
+             pk_class = getattr(mod, class_name)
+         except AttributeError:
+             raise ValueError(f"Could not find '{class_name}' in '{module}'.")
+-        if not issubclass(pk_class, AutoField):
++        if not issubclass(pk_class, (AutoField, BigAutoField, SmallAutoField)):
+             raise ValueError(
+                 f"Primary key '{settings.DEFAULT_AUTO_FIELD}' referred by "
+                 f"DEFAULT_AUTO_FIELD must subclass AutoField."

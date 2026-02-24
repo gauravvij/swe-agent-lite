@@ -1,0 +1,37 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0e823141c2..f2780b1d2e 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -895,11 +895,12 @@ class Field(RegisterLookupMixin):
+         defaults = {'required': not self.blank, 'label': self.verbose_name,
+                      'help_text': self.help_text}
+         if self.has_default():
+-            defaults['show_hidden_initial'] = True
+             if callable(self.default):
+                 defaults['initial'] = self.default
++                defaults['show_hidden_initial'] = False
+             else:
+                 defaults['initial'] = self.get_default()
++                defaults['show_hidden_initial'] = True
+         if self.choices:
+             include_blank = (self.blank or
+                              (self.default is not None and
+diff --git a/tests/model_fields/tests.py b/tests/model_fields/tests.py
+index 7e3e77b6f3..a8c9f8e9c2 100644
+--- a/tests/model_fields/tests.py
++++ b/tests/model_fields/tests.py
+@@ -29,6 +29,15 @@ class BasicFieldTests(SimpleTestCase):
+         form_field = model_field.formfield(show_hidden_initial=False)
+         self.assertFalse(form_field.show_hidden_initial)
+ 
++    def test_show_hidden_initial_callable_default(self):
++        """
++        Fields with callable defaults don't show hidden initial.
++        """
++        model_field = models.Field(default=list)
++        form_field = model_field.formfield()
++        self.assertFalse(form_field.show_hidden_initial)
++
+     def test_field_repr(self):
+         """
+         __repr__() of a field displays its name.

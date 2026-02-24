@@ -1,0 +1,16 @@
+--- a/sympy/printing/mathematica.py
++++ b/sympy/printing/mathematica.py
+@@ -72,6 +72,14 @@ class MCodePrinter(CodePrinter):
+         res = super(MCodePrinter, self)._print_Mul(expr.func(*c))
+         return res
+ 
++    def _print_Derivative(self, expr):
++        return "D[%s]" % (self.stringify(expr.args, ", "))
++
++    def _print_Float(self, expr):
++        res = str(expr)
++        return res.replace('e', '*^')
++
++
+ def mathematica_code(expr, **settings):
+     return MCodePrinter(settings).doprint(expr)

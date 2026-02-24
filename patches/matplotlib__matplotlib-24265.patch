@@ -1,0 +1,41 @@
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -168,6 +168,25 @@ def update_nested_dict(main_dict, new_dict):
+     return main_dict
+ 
+ 
++# Backward compatibility aliases for seaborn styles renamed in Matplotlib 3.6
++_SEABORN_RENAMES = {
++    'seaborn': 'seaborn-v0_8',
++    'seaborn-bright': 'seaborn-v0_8-bright',
++    'seaborn-colorblind': 'seaborn-v0_8-colorblind',
++    'seaborn-dark': 'seaborn-v0_8-dark',
++    'seaborn-darkgrid': 'seaborn-v0_8-darkgrid',
++    'seaborn-dark-palette': 'seaborn-v0_8-dark-palette',
++    'seaborn-deep': 'seaborn-v0_8-deep',
++    'seaborn-muted': 'seaborn-v0_8-muted',
++    'seaborn-notebook': 'seaborn-v0_8-notebook',
++    'seaborn-paper': 'seaborn-v0_8-paper',
++    'seaborn-pastel': 'seaborn-v0_8-pastel',
++    'seaborn-poster': 'seaborn-v0_8-poster',
++    'seaborn-talk': 'seaborn-v0_8-talk',
++    'seaborn-ticks': 'seaborn-v0_8-ticks',
++    'seaborn-white': 'seaborn-v0_8-white',
++    'seaborn-whitegrid': 'seaborn-v0_8-whitegrid',
++}
++
+ # Load style library
+ # ==================
+ base_library = _load_base_library()
+@@ -175,6 +194,11 @@ def update_nested_dict(main_dict, new_dict):
+ library = None
+ available = None
+ 
++# Add backward compatibility aliases for old seaborn style names
++for old_name, new_name in _SEABORN_RENAMES.items():
++    if new_name in base_library and old_name not in base_library:
++        base_library[old_name] = base_library[new_name]
++
+ 
+ def reload_library():
+     """Reload the style library."""

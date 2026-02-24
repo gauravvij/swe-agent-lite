@@ -1,0 +1,57 @@
+diff --git a/django/db/migrations/recorder.py b/django/db/migrations/recorder.py
+--- a/django/db/migrations/recorder.py
++++ b/django/db/migrations/recorder.py
+@@ -1,4 +1,5 @@
+ from django.apps.registry import Apps
++from django.db import router
+ from django.db import DatabaseError, models
+ from django.db.transaction import atomic
+ from django.utils.timezone import now
+@@ -50,6 +51,12 @@ class MigrationRecorder:
+         self.connection = connection
+         self._migration_class = None
+ 
++    def _allowed(self):
++        """
++        Returns whether migrations are allowed on this database.
++        """
++        return router.allow_migrate(self.connection.alias, self.Migration)
++
+     @property
+     def Migration(self):
+         """
+@@ -63,6 +70,8 @@ class MigrationRecorder:
+         return self._migration_class
+ 
+     def ensure_schema(self):
++        if not self._allowed():
++            return
+         # If the table doesn't exist, create it
+         if not self.has_table():
+             raise MigrationSchemaMissing("Unable to create the django_migrations table")
+@@ -76,6 +85,8 @@ class MigrationRecorder:
+         """
+         Returns a set of (app, name) tuples of applied migrations.
+         """
++        if not self._allowed():
++            return set()
+         self.ensure_schema()
+         return {tuple(x) for x in self.Migration.objects.values_list("app", "name")}
+ 
+@@ -83,6 +94,8 @@ class MigrationRecorder:
+         """
+         Records that a migration was applied.
+         """
++        if not self._allowed():
++            return
+         self.ensure_schema()
+         self.Migration.objects.create(app=app, name=name, applied=now())
+ 
+@@ -90,5 +103,7 @@ class MigrationRecorder:
+         """
+         Records that a migration was unapplied.
+         """
++        if not self._allowed():
++            return
+         self.ensure_schema()
+         self.Migration.objects.filter(app=app, name=name).delete()

@@ -1,0 +1,11 @@
+--- a/django/template/defaultfilters.py
++++ b/django/template/defaultfilters.py
+@@ -567,11 +567,15 @@ def filesizeformat(value):
+     return value
+ 
+ 
+-@register.filter(is_safe=True)
+-def join(value, arg):
++@register.filter(is_safe=True, needs_autoescape=True)
++def join(value, arg, autoescape=True):
+     """

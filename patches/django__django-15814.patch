@@ -1,0 +1,13 @@
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -2240,7 +2240,9 @@ class RelatedPopulator:
+         self.model_cls = klass_info['model']
+         self.select_fields = klass_info['select_fields']
+         self.init_list = [f[0].target.attname for f in select[self.select_fields[0]:self.select_fields[-1] + 1]]
+-        self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
++        # Use concrete model to handle proxy models correctly.
++        model = self.model_cls._meta.concrete_model
++        self.pk_idx = self.init_list.index(model._meta.pk.attname)
+         self.related_populators = get_related_populators(klass_info, select, db)
+         self.local_setter = klass_info['local_setter']
+         self.remote_setter = klass_info['remote_setter']

@@ -1,0 +1,32 @@
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -19,7 +19,8 @@
+ from .packages.urllib3.exceptions import HTTPError as _HTTPError
+ from .packages.urllib3.exceptions import MaxRetryError
+ from .packages.urllib3.exceptions import TimeoutError
+-from .exceptions import ConnectionError, HTTPError, URLRequired, TooManyRedirects
++from .exceptions import (ConnectionError, HTTPError, URLRequired, 
++                        TooManyRedirects, ContentDecodingError)
+ from .exceptions import SSLError, MissingSchema, InvalidURL, ChunkedEncodingError
+ from .utils import (
+     guess_filename, get_auth_from_url, requote_uri,
+@@ -631,8 +632,8 @@
+                 try:
+                     content = r.content
+                 except DecodeError as e:
+-                    r.content = None
+-                    raise e
++                    raise ContentDecodingError(e)
+ 
+             # Save cookies in Response.
+             extract_cookies_to_jar(self.cookies, request, r.raw)
+--- a/requests/adapters.py
++++ b/requests/adapters.py
+@@ -380,7 +380,7 @@
+             elif isinstance(e, _ProxyError):
+                 raise ProxyError(e)
+             elif isinstance(e, TimeoutError):
+-                raise
++                raise Timeout(e)
+             elif isinstance(e, _HTTPError):
+                 raise HTTPError(e)

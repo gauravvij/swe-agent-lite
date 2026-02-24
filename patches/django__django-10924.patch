@@ -1,0 +1,35 @@
+--- a/tests/migrations/test_writer.py
++++ b/tests/migrations/test_writer.py
+@@ -46,6 +46,15 @@ class TestModel1:
+     thing = models.FileField(upload_to=upload_to)
+ 
+ 
++def get_dynamic_path():
++    return os.path.join(settings.LOCAL_FILE_DIR, 'example_dir')
++
++
++class TestModel2:
++    file = models.FilePathField(path=get_dynamic_path)
++
++
+ class OperationWriterTests(SimpleTestCase):
+ 
+     def test_empty_signature(self):
+@@ -115,3 +124,21 @@ class OperationWriterTests(SimpleTestCase):
+             '    ),\n'
+             '    arg2=custom_migration_operations.operations.KwargsOperation(\n'
+             '        kwarg1=3,\n'
++            '        kwarg2=4,\n'
++            '    ),\n'
++            '),'
++        )
++
++
++class MigrationWriterTests(SimpleTestCase):
++
++    def test_serialize_filepathfield_callable_path(self):
++        """FilePathField path parameter can be a callable."""
++        field = models.FilePathField(path=get_dynamic_path)
++        string, imports = MigrationWriter.serialize(field)
++        self.assertEqual(string, 'models.FilePathField(path=get_dynamic_path)')
++        self.assertIn('import tests.migrations.test_writer', imports)

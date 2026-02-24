@@ -1,0 +1,8 @@
+--- a/django/utils/autoreload.py
++++ b/django/utils/autoreload.py
+@@ -100,7 +100,7 @@ def iter_template_dirs():
+     for config in settings.TEMPLATES:
+         for dir_ in config.get('DIRS', []):
+             if isinstance(dir_, (str, Path)):
+-                yield dir_
++                yield str(dir_)

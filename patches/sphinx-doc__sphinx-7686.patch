@@ -1,0 +1,16 @@
+--- a/sphinx/ext/autosummary/generate.py
++++ b/sphinx/ext/autosummary/generate.py
+@@ -147,6 +147,15 @@ def generate_autosummary_content(name: str, obj: Any, parent: Any,
+     if ismodule(obj):
+         ns['members'] = dir(obj)
+         ns['functions'] = []
++        if not app.config.autosummary_imported_members:
++            # Filter out imported members
++            def is_imported(name: str) -> bool:
++                try:
++                    member = getattr(obj, name)
++                    return getattr(member, '__module__', None) != obj.__name__
++                except AttributeError:
++                    return False
++            ns['members'] = [m for m in ns['members'] if not is_imported(m)]
+         ns['classes']

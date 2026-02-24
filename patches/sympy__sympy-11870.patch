@@ -1,0 +1,22 @@
+--- a/sympy/solvers/ode.py
++++ b/sympy/solvers/ode.py
+@@ -690,6 +690,20 @@ def odesimp(ode, func, order, hint):
+     # Simplify arbitrary constants
+     expr = constantsimp(expr, ode.func, order)
+     
++    # Convert exponential forms to trigonometric forms
++    # e.g., 1/2*(-I*exp(I*k) + I*exp(-I*k)) -> sin(k)
++    from sympy import exp, sin, sinc
++    if expr.has(exp):
++        # Rewrite using Euler's formula to convert exp(I*x) to sin/cos
++        expr = expr.rewrite(sin)
++        # Check for sinc pattern sin(k)/k -> sinc(k)
++        if expr.has(sin):
++            try:
++                expr_sinc = expr.rewrite(sinc)
++                if expr_sinc.count(sinc) > 0:
++                    expr = expr_sinc
++            except:
++                pass
++    
+     return expr

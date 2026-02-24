@@ -1,0 +1,16 @@
+--- a/sympy/physics/units/util.py
++++ b/sympy/physics/units/util.py
+@@ -78,6 +78,15 @@ def convert_to(expr, target_units, unit_system=None):
+         # Solve the system of equations
+         solution = solve(eqs, *src_dims, dict=True)
+         
++        # Check if solution is valid (no fractional exponents for target units)
++        if solution:
++            for sol in solution:
++                for val in sol.values():
++                    if val.is_Rational and val.q != 1:
++                        # Fractional exponent found, conversion not possible
++                        return expr
++        
+         # Apply the solution
+         # ... existing code ...

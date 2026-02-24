@@ -1,0 +1,25 @@
+--- a/django/forms/widgets.py
++++ b/django/forms/widgets.py
+@@ -65,7 +65,11 @@ class Media:
+         if media:
+             css = getattr(media, 'css', {})
+             js = getattr(media, 'js', [])
+         self._css = css or {}
+-        self._js = js or []
++        self._js_lists = [js] if js else []
++
++    @property
++    def _js(self):
++        return self.merge(self._js_lists)
+ 
+     def __str__(self):
+         return self.render()
+@@ -82,7 +86,7 @@ class Media:
+     def __add__(self, other):
+         combined = Media()
+         combined._css = {**self._css, **other._css}
+-        combined._js = self.merge([self._js, other._js])
++        combined._js_lists = self._js_lists + other._js_lists
+         return combined
+ 
+     def render_js(self):

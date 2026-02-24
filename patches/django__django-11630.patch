@@ -1,0 +1,11 @@
+--- a/django/core/management/commands/loaddata.py
++++ b/django/core/management/commands/loaddata.py
+@@ -64,7 +64,7 @@ class Command(BaseCommand):
+         self.fixture_count = 0
+         self.loaded_object_count = 0
+         self.fixture_object_count = 0
+-        self.models = set()
++        self.models = {}
+ 
+         self.serialization_formats = serializers.get_public_serializer_formats()
+         # Forcing binary mode may be revisited after dropping Python 2 support (see #22399)

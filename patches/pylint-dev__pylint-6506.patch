@@ -1,0 +1,20 @@
+--- a/pylint/config/config_initialization.py
++++ b/pylint/config/config_initialization.py
+@@ -10,6 +10,7 @@ from pathlib import Path
+ from typing import TYPE_CHECKING, List, Optional, Union
+ 
+ from pylint import reporters
++from pylint.config.exceptions import _UnrecognizedOptionError
+ from pylint.utils import utils
+ 
+ if TYPE_CHECKING:
+@@ -62,6 +63,8 @@ def _config_initialization(
+         args_list = linter.load_command_line_configuration(args_list)
+     except SystemExit as exc:
+         if exc.code == 2:  # bad options
+             exc.code = 32
+         raise
++    except _UnrecognizedOptionError:
++        sys.exit(32)
+ 
+     # args_list should now only be a list of files/directories to lint. All options have

@@ -1,0 +1,11 @@
+--- a/django/contrib/auth/management/__init__.py
++++ b/django/contrib/auth/management/__init__.py
+@@ -52,7 +52,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
+     for klass in classes:
+         # Get the content type for this model to determine which permissions
+         # are needed.
+-        content_type = ContentType.objects.get_for_model(klass)
++        content_type = ContentType.objects.db_manager(using).get_for_model(klass)
+         ctype_id = content_type.id
+         # Build the list of permission codenames required for this model.
+         for perm in _get_all_permissions(klass._meta):

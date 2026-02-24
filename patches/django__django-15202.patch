@@ -1,0 +1,14 @@
+--- a/django/core/validators.py
++++ b/django/core/validators.py
+@@ -127,7 +127,10 @@ class URLValidator(RegexValidator):
+         value = str(value)
+         # Check if the scheme is valid.
+         scheme = value.split('://')[0].lower()
+-        splitted_url = urlsplit(value)
++        try:
++            splitted_url = urlsplit(value)
++        except ValueError:
++            raise ValidationError(self.message, code=self.code)
+         try:
+             scheme = splitted_url.scheme
+         except ValueError:

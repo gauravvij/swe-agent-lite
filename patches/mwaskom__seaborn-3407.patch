@@ -1,0 +1,29 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1487,9 +1487,9 @@ class PairGrid(Grid):
+             if ax is None:  # i.e. we are in corner mode
+                 plt.sca(ax)
+ 
+-            vector = self.data[var]
++            vector = self.data.loc[:, var]
+             if self._hue_var is not None:
+-                hue = self.data[self._hue_var]
++                hue = self.data.loc[:, self._hue_var]
+ 
+             plt.sca(ax)
+ 
+@@ -1514,9 +1514,9 @@ class PairGrid(Grid):
+     def _plot_offdiag(self, ax, func, x_var, y_var, **kwargs):
+         """Draw a single bivariate plot on the given axes."""
+         # TODO insert ax here?
+-        x = self.data[x_var]
+-        y = self.data[y_var]
++        x = self.data.loc[:, x_var]
++        y = self.data.loc[:, y_var]
+         if self._hue_var is not None:
+-            hue = self.data[self._hue_var]
++            hue = self.data.loc[:, self._hue_var]
+             kwargs["hue"] = hue
+             kwargs["hue_order"] = self._hue_order
+             kwargs["palette"] = self._orig_palette

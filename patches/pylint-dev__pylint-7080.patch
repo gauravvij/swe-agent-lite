@@ -1,0 +1,28 @@
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -45,6 +45,16 @@
+ def expand_modules(files_or_modules, ignore_list, ignore_list_re, ignore_paths_re):
+     """Return a list of modules and their path."""
+     result = []
++    # Normalize ignore_paths_re for matching
++    ignore_patterns = ignore_paths_re or []
++    
+     for file_or_module in files_or_modules:
+         if os.path.isdir(file_or_module):
+             for root, dirs, files in os.walk(file_or_module):
++                # Filter out ignored directories during the walk to avoid descending into them
++                if ignore_patterns:
++                    dirs[:] = [
++                        d
++                        for d in dirs
++                        if not any(pattern.match(os.path.join(root, d)) for pattern in ignore_patterns)
++                    ]
+                 for filename in files:
+                     if filename.endswith(".py"):
+                         filepath = os.path.join(root, filename)
++                        # Skip files matching ignore_paths patterns
++                        if ignore_patterns and any(pattern.match(filepath) for pattern in ignore_patterns):
++                            continue
+                         result.append(filepath)
+         else:
+             result.append(file_or_module)

@@ -1,0 +1,29 @@
+--- a/sympy/combinatorics/permutations.py
++++ b/sympy/combinatorics/permutations.py
+@@ -..., ... @@
+                 # Input is a list of cycles
+-                # Check that cycles are disjoint
+-                elems = set()
+-                for c in input:
+-                    if set(c) & elems:
+-                        raise ValueError("The cycles must be disjoint")
+-                    elems.update(c)
+-                
+-                # Convert disjoint cycles to array form
+-                temp = list(range(size))
+-                for c in input:
+-                    for i in range(len(c)):
+-                        temp[c[i]] = c[(i + 1) % len(c)]
+-                return cls._af_new(temp)
++                # Handle non-disjoint cycles by composing them left-to-right
++                # Start with identity permutation
++                result = cls([], size=size)
++                for c in input:
++                    # Create permutation from single cycle
++                    temp = list(range(size))
++                    for i in range(len(c)):
++                        temp[c[i]] = c[(i + 1) % len(c)]
++                    cycle_perm = cls._af_new(temp)
++                    # Compose: apply cycle_perm after result (left-to-right)
++                    result = cycle_perm * result
++                return result

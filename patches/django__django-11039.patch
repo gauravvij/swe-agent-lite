@@ -1,0 +1,52 @@
+diff --git a/django/core/management/commands/sqlmigrate.py b/django/core/management/commands/sqlmigrate.py
+index d3b2029324..c9f2f3a7f6 100644
+--- a/django/core/management/commands/sqlmigrate.py
++++ b/django/core/management/commands/sqlmigrate.py
+@@ -59,9 +59,10 @@ class Command(BaseCommand):
+ 
+         # Show begin/end around output only for atomic migrations. Non-atomic
+         # migrations have the correct behavior already. Ignoring the atomic
+-        # attribute of the migration and use our atomic attribute instead.
+-        self.output_transaction = migration.atomic
++        # attribute of the migration and use our atomic attribute instead,
++        # but only if the database supports transactional DDL.
++        self.output_transaction = migration.atomic and connection.features.can_rollback_ddl
+ 
+         # Make a plan that represents just the requested migrations and show SQL
+         # for it
+diff --git a/tests/migrations/test_commands.py b/tests/migrations/test_commands.py
+index 1a5b8a62a8..8e7e3a2c15 100644
+--- a/tests/migrations/test_commands.py
++++ b/tests/migrations/test_commands.py
+@@ -3,6 +3,7 @@ import os
+ import re
+ import sys
+ import tempfile
++from unittest import mock
+ 
+ from django.apps import apps
+ from django.core.management import CommandError, call_command
+@@ -298,6 +299,23 @@ class MigrateTests(MigrationTestBase):
+         self.assertNotIn("BEGIN;", out.getvalue())
+         self.assertNotIn("COMMIT;", out.getvalue())
+ 
++    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
++    def test_sqlmigrate_no_transactional_ddl(self):
++        """
++        sqlmigrate doesn't wrap its output in BEGIN/COMMIT if the database
++        doesn't support transactional DDL.
++        """
++        out = io.StringIO()
++        with mock.patch.object(
++            connections['default'].features,
++            'can_rollback_ddl',
++            False,
++        ):
++            call_command("sqlmigrate", "migrations", "0001", stdout=out)
++        out = out.getvalue()
++        self.assertNotIn("BEGIN;", out)
++        self.assertNotIn("COMMIT;", out)
++
+     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+     def test_sqlmigrate_backwards(self):
+         out = io.StringIO()

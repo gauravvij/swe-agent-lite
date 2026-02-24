@@ -1,0 +1,11 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1564,6 +1564,9 @@ class LatexPrinter(Printer):
+     def _print_Transpose(self, expr):
+         return "%s^{T}" % self._print(expr.arg)
+ 
++    def _print_Trace(self, expr):
++        return r"\operatorname{tr}\left(%s\right)" % self._print(expr.arg)
++
+     def _print_MatAdd(self, expr):
+         terms = list(expr.args)

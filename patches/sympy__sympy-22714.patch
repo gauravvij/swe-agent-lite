@@ -1,0 +1,19 @@
+--- a/sympy/parsing/sympy_parser.py
++++ b/sympy/parsing/sympy_parser.py
+@@ -13,6 +13,7 @@ import unicodedata
+ 
+ import sympy
+ from sympy.core.compatibility import exec_, StringIO
++from sympy.core.evaluate import evaluate
+ from sympy.core.basic import Basic
+ 
+ _re_repeated = re.compile(r"^(\d*)\.(\d*)\[(\d+)\]$")
+@@ -1018,7 +1019,8 @@ def parse_expr(s, local_dict=None, transformations=standard_transformations,
+         with evaluate(False):
+             rv = eval_expr(code, local_dict, global_dict)
+     else:
+-        rv = eval_expr(code, local_dict, global_dict)
++        with evaluate(True):
++            rv = eval_expr(code, local_dict, global_dict)
+ 
+     if not evaluate:

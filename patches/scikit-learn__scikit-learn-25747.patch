@@ -1,0 +1,16 @@
+diff --git a/sklearn/utils/_set_output.py b/sklearn/utils/_set_output.py
+--- a/sklearn/utils/_set_output.py
++++ b/sklearn/utils/_set_output.py
+@@ -42,6 +42,13 @@ def _wrap_in_pandas_container(data_to_wrap, columns, index=None):
+             data_to_wrap.index = index
+         return data_to_wrap
+ 
++    if isinstance(data_to_wrap, pd.Series):
++        data_to_wrap = data_to_wrap.to_frame()
++        if columns is not None:
++            data_to_wrap.columns = columns
++        if index is not None:
++            data_to_wrap.index = index
++        return data_to_wrap
++
+     return pd.DataFrame(data_to_wrap, index=index, columns=columns)

@@ -1,0 +1,34 @@
+--- a/sympy/vector/basisdependent.py
++++ b/sympy/vector/basisdependent.py
+@@ -44,6 +44,29 @@ class BasisDependent(Expr):
+     def components(self):
+         return self._components
+ 
++    def _pretty(self, printer):
++        from sympy.printing.pretty.stringpict import prettyForm
++        from sympy.core import S
++        
++        items = []
++        for basis_vec, coeff in self.components.items():
++            # Print the scalar coefficient
++            coeff_pretty = printer._print(coeff)
++            # Print the basis vector
++            basis_pretty = printer._print(basis_vec)
++            # Combine them side by side (coefficient first, then basis)
++            combined = prettyForm(*coeff_pretty.right(basis_pretty))
++            items.append(combined)
++        
++        if not items:
++            return printer._print(S.Zero)
++        
++        # Combine all items with plus signs
++        result = items[0]
++        for item in items[1:]:
++            result = prettyForm(*result.right(' + '))
++            result = prettyForm(*result.right(item))
++        
++        return result
++
+     def _evalf(self, prec=None, **options):
+         n = self.__class__(*[x._evalf(prec, **options) for x in self.args])
+         return n

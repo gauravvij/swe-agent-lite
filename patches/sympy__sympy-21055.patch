@@ -1,0 +1,31 @@
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -78,6 +78,21 @@ def refine_abs(expr, assumptions):
+     return expr
+ 
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument function.
++    
++    If the argument is known to be positive real, arg is 0.
++    If the argument is known to be negative real, arg is pi.
++    """
++    from sympy import Q, pi
++    arg_term = expr.args[0]
++    if ask(Q.positive(arg_term), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_term), assumptions):
++        return S.Pi
++    return expr
++
++
+ def refine_sqrt(expr, assumptions):
+     """
+     Handler for sqrt.
+@@ -... 
+ handlers_dict = {
+     'abs': refine_abs,
+     'sqrt': refine_sqrt,
++    'arg': refine_arg,
+ }

@@ -1,0 +1,26 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -447,10 +447,7 @@ class LatexPrinter(Printer):
+         return r"%s^{\circ}" % self._print(expr.args[0])
+ 
+     def _print_exp(self, expr):
+-        ex = expr.args[0]
+-        if ex.is_negative:
+-            return r"\frac{1}{e^{%s}}" % self._print(-ex)
+-        return r"e^{%s}" % self._print(ex)
++        return r"e^{%s}" % self._print(expr.args[0])
+ 
+     def _print_ExpBase(self, expr):
+         # ...
+@@ -520,7 +517,10 @@ class LatexPrinter(Printer):
+                 return sign + r" \cdot ".join(terms)
+ 
+         if denom:
+-            denom_str = self._print(Mul(*denom))
++            if len(denom) == 1:
++                denom_str = self._print(denom[0])
++            else:
++                denom_str = r" \cdot ".join([self._print(d) for d in denom])
+             if numer:
+                 return r"\frac{%s}{%s}" % (self._print(numer), denom_str)
+             else:

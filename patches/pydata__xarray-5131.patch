@@ -1,0 +1,10 @@
+--- a/xarray/core/groupby.py
++++ b/xarray/core/groupby.py
+@@ -206,7 +206,7 @@ class GroupBy:
+ 
+     def __repr__(self):
+         return (
+-            f"{self.__class__.__name__}, grouped over '{self._group.name}' \n"
++            f"{self.__class__.__name__}, grouped over '{self._group.name}'\n"
+             f"{len(self)} groups with labels {list(self.groups.keys())}."
+         )

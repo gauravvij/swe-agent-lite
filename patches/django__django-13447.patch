@@ -1,0 +1,38 @@
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -398,7 +398,7 @@ class AdminSite:
+         for model in self._registry:
+             app_label = model._meta.app_label
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -430,6 +430,7 @@ class AdminSite:
+                 model_dict = {
+                     'name': capfirst(model._meta.verbose_name_plural),
+                     'object_name': model._meta.object_name,
++                    'model': model,
+                     'perms': perms,
+                 }
+ 
+@@ -471,7 +472,7 @@ class AdminSite:
+         Return the index template along with the app list context.
+         """
+         context = dict(self.each_context(request))
+-        app_dict = self._build_app_dict(request)
++        app_dict = self.build_app_dict(request)
+         if not app_dict:
+             raise Http404('The requested admin page does not exist.')
+         context.update({
+@@ -502,7 +503,7 @@ class AdminSite:
+         Return the app index template along with the app list context.
+         """
+         context = dict(self.each_context(request))
+-        app_dict = self._build_app_dict(request, app_label)
++        app_dict = self.build_app_dict(request, app_label)
+         if not app_dict:
+             raise Http404('The requested admin page does not exist.')
+         context.update({

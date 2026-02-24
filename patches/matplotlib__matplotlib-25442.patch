@@ -1,0 +1,21 @@
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1514,7 +1514,8 @@ class DraggableBase:
+     """
+     Helper base class for a draggable artist.
+     """
+-    canvas = property(lambda self: self.ref_artist.figure.canvas)
++    canvas = property(lambda self: self.ref_artist.figure.canvas
++                      if self.ref_artist.figure is not None else None)
+ 
+     def __init__(self, ref_artist, use_blit=False):
+         self.ref_artist = ref_artist
+@@ -1565,6 +1566,9 @@ class DraggableBase:
+             return False
+ 
+     def disconnect(self):
++        """Disconnect the callbacks."""
++        if self.canvas is None:
++            return
+         for cid in self._cids:
+             self.canvas.mpl_disconnect(cid)

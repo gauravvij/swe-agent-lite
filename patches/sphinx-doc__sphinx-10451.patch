@@ -1,0 +1,22 @@
+--- a/sphinx/ext/autodoc/typehints.py
++++ b/sphinx/ext/autodoc/typehints.py
+@@ -93,7 +93,8 @@ def merge_typehints(app: Sphinx, objtype: str, signature: Signature,
+         if field_list is not None:
+             for field in field_list:
+                 if field[0] == 'param':
+-                    field_params.add(field[1])
++                    param_name = field[1]
++                    field_params.add(param_name.lstrip('*'))
+ 
+     # Merge type hints for parameters
+     for param in signature.parameters.values():
+@@ -101,7 +102,8 @@ def merge_typehints(app: Sphinx, objtype: str, signature: Signature,
+         if param.annotation is Parameter.empty:
+             continue
+ 
+-        if param.name not in field_params:
++        normalized_name = param.name.lstrip('*')
++        if normalized_name not in field_params:
+             # Add a new field for this parameter
+             if param.kind == Parameter.VAR_POSITIONAL:
+                 field_name = '*%s' % param.name

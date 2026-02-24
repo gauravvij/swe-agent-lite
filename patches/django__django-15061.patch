@@ -1,0 +1,14 @@
+--- a/django/forms/widgets.py
++++ b/django/forms/widgets.py
+@@ -900,9 +900,6 @@ class MultiWidget(Widget):
+         super().__init__(attrs)
+         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
+ 
+-    def id_for_label(self, id_):
+-        if id_:
+-            return f"{id_}0"
+-        return id_
+-
+     def get_context(self, name, value, attrs):
+         context = super().get_context(name, value, attrs)
+         if self.is_localized:

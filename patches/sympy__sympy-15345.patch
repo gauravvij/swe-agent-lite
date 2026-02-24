@@ -1,0 +1,15 @@
+--- a/sympy/printing/mathematica.py
++++ b/sympy/printing/mathematica.py
+@@ -110,6 +110,12 @@ class MCodePrinter(Printer):
+     def _print_Integral(self, expr):
+         return "Integrate[%s, %s]" % (self.doprint(expr.function), self.doprint(expr.limits[0]))
+ 
++    def _print_Max(self, expr):
++        return "Max[%s]" % ", ".join(self.doprint(arg) for arg in expr.args)
++
++    def _print_Min(self, expr):
++        return "Min[%s]" % ", ".join(self.doprint(arg) for arg in expr.args)
++
+ 
+ def mathematica_code(expr, **settings):
+     r"""

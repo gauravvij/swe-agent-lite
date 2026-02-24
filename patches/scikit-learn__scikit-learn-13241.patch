@@ -1,0 +1,21 @@
+--- a/sklearn/decomposition/kernel_pca.py
++++ b/sklearn/decomposition/kernel_pca.py
+@@ -13,6 +13,7 @@ from ..utils import check_array, check_random_state
+ from ..utils.validation import check_is_fitted
+ from ..utils.validation import check_array
+ from ..metrics.pairwise import pairwise_kernels
++from ..utils.extmath import svd_flip
+ from ..preprocessing import KernelCenterer
+ 
+ 
+@@ -132,6 +133,10 @@ class KernelPCA(BaseEstimator, TransformerMixin):
+         indices = self.lambdas_.argsort()[::-1]
+         self.lambdas_ = self.lambdas_[indices]
+         self.alphas_ = self.alphas_[:, indices]
++        
++        # Make sure the signs are deterministic
++        self.alphas_ = svd_flip(self.alphas_, np.zeros((n_components, n_components)))[0]
++        
+         # remove eigenvectors with zero eigenvalues
+         self.alphas_ = self.alphas_[:, self.lambdas_ > 0]
+         self.lambdas_ = self.lambdas_[self.lambdas_ > 0]

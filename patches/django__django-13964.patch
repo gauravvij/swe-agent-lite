@@ -1,0 +1,19 @@
+--- a/django/db/models/fields/related.py
++++ b/django/db/models/fields/related.py
+@@ -955,6 +955,17 @@ class ForeignKey(ForeignObject):
+     def pre_save(self, model_instance, add):
+         if self.remote_field.parent_link:
+             return None
++        # Update the FK value if the cached relation's PK has changed
++        try:
++            cached_obj = self.get_cached_value(model_instance)
++        except KeyError:
++            pass
++        else:
++            if cached_obj is not None:
++                current_fk_val = self.get_local_related_value(model_instance)
++                new_fk_val = self.get_foreign_related_value(cached_obj)
++                if current_fk_val != new_fk_val:
++                    for lh_field, rh_field in zip(self.local_related_fields, self.foreign_related_fields):
++                        setattr(model_instance, lh_field.attname, getattr(cached_obj, rh_field.attname))
+         return getattr(model_instance, self.attname)

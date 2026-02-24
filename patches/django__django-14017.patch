@@ -1,0 +1,45 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index abc123..def456 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -70,7 +70,7 @@ class Q(tree.Node):
+ 
+     def _combine(self, other, conn):
+         if not isinstance(other, Q):
+-            raise TypeError(other)
++            return NotImplemented
+ 
+         # If the other Q() is empty, ignore it and just use `self`.
+         if not other:
+diff --git a/tests/annotations/tests.py b/tests/annotations/tests.py
+index abc123..def456 100644
+--- a/tests/annotations/tests.py
++++ b/tests/annotations/tests.py
+@@ -7,6 +7,7 @@ from django.db.models import (
+     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
+     IntegerField, NullBooleanField, OuterRef, Q, Subquery, Sum, Value,
+ )
++from django.db.models.expressions import Exists
+ from django.db.models.expressions import RawSQL
+ from django.db.models.functions import Length, Lower
+ from django.test import TestCase, skipUnlessDBFeature
+@@ -265,6 +266,18 @@ class NonAggregateAnnotationTestCase(TestCase):
+         self.assertEqual(author.other_name, author.name)
+ 
+     def test_combined_annotation_commutative(self):
++        # Regression test for #29727: Q & Exists should be commutative
++        exists = Exists(Book.objects.all())
++        q = Q()
++        
++        # Both should work without raising TypeError
++        combined1 = exists & q
++        combined2 = q & exists
++        
++        # Both should return Q objects
++        self.assertIsInstance(combined1, Q)
++        self.assertIsInstance(combined2, Q)
++
++    def test_combined_annotation_commutative_values(self):
+         # Regression test for #24924
+         self.assertEqual(
+             Author.objects.annotate(

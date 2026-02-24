@@ -1,0 +1,12 @@
+diff --git a/django/db/models/fields/reverse_related.py b/django/db/models/fields/reverse_related.py
+--- a/django/db/models/fields/reverse_related.py
++++ b/django/db/models/fields/reverse_related.py
+@@ -334,7 +334,7 @@ class ManyToManyRel(ForeignObjectRel):
+ 
+     @property
+     def identity(self):
+-        return super().identity + (self.through, self.through_fields)
++        return super().identity + (self.through, make_hashable(self.through_fields))
+ 
+     @property
+     def related_fields(self):

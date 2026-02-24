@@ -1,0 +1,24 @@
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -215,7 +215,8 @@ class Cmdoption(ObjectDescription):
+     """
+ 
+     # option string parser
+-    option_re = re.compile(r'^(?:(?:-|--|\+|/)[^=\s]+(?:=.*)?|[^-\+/\s]\S*)$')
++    # Accept any option description to support various CLI syntaxes (e.g., [enable=]PATTERN)
++    option_re = re.compile(r'^.+$')
+ 
+     def handle_signature(self, sig, signode):
+         """Transform an option description into RST nodes."""
+@@ -226,10 +227,7 @@ class Cmdoption(ObjectDescription):
+             name = args[0].strip()
+             # validate the option description
+             if not self.option_re.match(name):
+-                logger.warning(
+-                    __('Malformed option description %r, should look like '
+-                       '"opt", "-opt args", "--opt args", "/opt args" or "+opt args"'),
+-                    name, location=location)
++                pass  # Allow any format, including non-standard ones like [enable=]PATTERN
+             signode += addnodes.desc_name(name, name)
+             if len(args) > 1:
+                 signode += addnodes.desc_addname(' ' + ' '.join(args[1:]), ' ' + ' '.join(args[1:]))

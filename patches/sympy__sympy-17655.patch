@@ -1,0 +1,12 @@
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -213,6 +213,9 @@ class Point(GeometryEntity):
+         coords = [simplify(a * other) for a in self.args]
+         return Point(coords, evaluate=False)
+ 
++    def __rmul__(self, other):
++        return self.__mul__(other)
++
+     def __add__(self, other):
+         """Add other to self."""
+         try:

@@ -1,0 +1,13 @@
+diff --git a/sphinx/environment/__init__.py b/sphinx/environment/__init__.py
+--- a/sphinx/environment/__init__.py
++++ b/sphinx/environment/__init__.py
+@@ -846,7 +846,9 @@ class BuildEnvironment:
+         # add prolog and epilog
+         filetype = get_filetype(self.config.source_suffix, docname)
+         if self.config.rst_prolog:
+-            content = self.config.rst_prolog + content
++            # Ensure the prolog ends with a blank line so it doesn't interfere
++            # with the document's first element (e.g., section headers).
++            content = self.config.rst_prolog.rstrip('\n') + '\n\n' + content
+         if self.config.rst_epilog:
+             content = content + self.config.rst_epilog

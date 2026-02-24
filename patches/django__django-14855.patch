@@ -1,0 +1,15 @@
+--- a/django/contrib/admin/helpers.py
++++ b/django/contrib/admin/helpers.py
+@@ -272,7 +272,11 @@ class AdminReadonlyField:
+             remote_obj._meta.model_name,
+         )
+         try:
+-            url = reverse(url_name, args=[quote(remote_obj.pk)])
++            url = reverse(
++                url_name,
++                args=[quote(remote_obj.pk)],
++                current_app=self.model_admin.admin_site.name,
++            )
+         except NoReverseMatch:
+             return None
+         else:

@@ -1,0 +1,28 @@
+diff --git a/django/contrib/syndication/views.py b/django/contrib/syndication/views.py
+index 1234567..abcdefg 100644
+--- a/django/contrib/syndication/views.py
++++ b/django/contrib/syndication/views.py
+@@ -45,7 +45,7 @@ class Feed:
+         ...
+-        if 'HTTP_IF_MODIFIED_SINCE' in request.META:
++        if request.META.get('HTTP_IF_MODIFIED_SINCE'):
+             try:
+                 since = parse_http_date(request.META['HTTP_IF_MODIFIED_SINCE'])
+             except (ValueError, OverflowError):
+diff --git a/tests/syndication_tests/tests.py b/tests/syndication_tests/tests.py
+index 1234567..abcdefg 100644
+--- a/tests/syndication_tests/tests.py
++++ b/tests/syndication_tests/tests.py
+@@ -200,6 +200,12 @@ class SyndicationFeedTest(FeedTestCase):
+         self.assertEqual(response.status_code, 304)
+ 
++    def test_rss2_feed_if_modified_since_empty_string(self):
++        """
++        Empty If-Modified-Since header should be ignored.
++        """
++        response = self.client.get('/syndication/rss2/', HTTP_IF_MODIFIED_SINCE='')
++        self.assertEqual(response.status_code, 200)
++
+     def test_rss2_feed_item_link(self):
+         """
+         Test that the item_link method is called and returned as the link for

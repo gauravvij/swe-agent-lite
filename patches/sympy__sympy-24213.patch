@@ -1,0 +1,12 @@
+--- a/sympy/physics/units/unitsystem.py
++++ b/sympy/physics/units/unitsystem.py
+@@ -176,7 +176,8 @@ class UnitSystem(object):
+                 factor, dim = self._collect_factor_and_dimension(arg)
+                 if dim is None:
+                     continue
+-                if dim != current_dim:
++                # Check if dimensions are equivalent (have same dimensional dependencies)
++                if dim != current_dim and dim.get_dimensional_dependencies() != current_dim.get_dimensional_dependencies():
+                     raise ValueError(
+                         'Dimension of "{}" is {}, but it should be {}'.format(
+                             arg, dim, current_dim))

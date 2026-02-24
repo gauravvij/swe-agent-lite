@@ -1,0 +1,37 @@
+diff --git a/lib/matplotlib/legend.py b/lib/matplotlib/legend.py
+--- a/lib/matplotlib/legend.py
++++ b/lib/matplotlib/legend.py
+@@ -335,7 +335,7 @@ class Legend(Artist):
+     def __init__(self, parent, handles, labels, loc=None, numpoints=None,
+                  markerscale=None, markerfirst=True, scatterpoints=None,
+                  scatteryoffsets=None, prop=None, fontsize=None, labelcolor=None,
+                  borderpad=None, labelspacing=None, handlelength=None,
+                  handleheight=None, handletextpad=None, borderaxespad=None,
+                  columnspacing=None, ncol=1, mode=None, fancybox=None,
+                  shadow=None, title=None, title_fontsize=None, framealpha=None,
+                  edgecolor=None, facecolor=None, bbox_to_anchor=None,
+                  bbox_transform=None, frameon=None, handler_map=None,
+-                 title_fontproperties=None, alignment='center'):
++                 title_fontproperties=None, alignment='center', draggable=False):
+         """
+         Parameters
+         ----------
+@@ -380,6 +380,9 @@ class Legend(Artist):
+         alignment : {'center', 'left', 'right'}, default: 'center'
+             The alignment of the legend title and the box of entries. The
+             entries are aligned as a single block, so that markers always
+             lined up.
++        draggable : bool, default: False
++            Whether the legend can be dragged with the mouse.
++
+         """
+         # ... existing initialization code ...
+         
+@@ -520,6 +523,8 @@ class Legend(Artist):
+         
+         self._draggable = None
++        self.draggable(draggable)
++
+ 
+     def _set_artist_props(self, a):
+         """

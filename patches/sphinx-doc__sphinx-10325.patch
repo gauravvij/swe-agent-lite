@@ -1,0 +1,50 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index abc123..def456 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -50,6 +50,20 @@ def members_option(arg: Any) -> Union[object, List[str]]:
+         return None
+     elif isinstance(arg, str):
+         return [x.strip() for x in arg.split(',') if x.strip()]
++    else:
++        return []
++
++
++def inherited_members_option(arg: Any) -> Union[bool, Set[str]]:
++    """Used to convert the :inherited-members: option to auto directives."""
++    if arg in (None, True):
++        return True
++    elif arg is False:
++        return False
++    elif isinstance(arg, str):
++        # Support both comma-separated and space-separated class names
++        return set(x.strip() for x in re.split(r'[,\s]+', arg) if x.strip())
++    else:
++        return set()
+ 
+ 
+ def exclude_members_option(arg: Any) -> Set[str]:
+@@ -150,7 +164,7 @@ class ClassDocumenter(Documenter):
+     option_spec: OptionSpec = {
+         'members': members_option,
+         'undoc-members': bool_option,
+-        'inherited-members': bool_option,
++        'inherited-members': inherited_members_option,
+         'show-inheritance': bool_option,
+         'special-members': members_option,
+         'exclude-members': exclude_members_option,
+@@ -350,8 +364,12 @@ class ClassDocumenter(Documenter):
+                 if cls is None or cls is self.object:
+                     # defined in the class itself, not inherited
+                     pass
+-                elif isinstance(self.options.inherited_members, str):
+-                    # inherited from a specific class - check if it matches
++                elif isinstance(self.options.inherited_members, (set, frozenset, list, tuple)):
++                    # inherited from specific classes - check if any match
++                    if cls.__name__ in self.options.inherited_members:
++                        skip = True
++                elif isinstance(self.options.inherited_members, str):
++                    # single class name provided (backward compatibility)
+                     if cls.__name__ == self.options.inherited_members:
+                         skip = True
+                 elif not self.options.inherited_members:

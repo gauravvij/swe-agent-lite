@@ -1,0 +1,59 @@
+diff --git a/django/contrib/admin/views/autocomplete.py b/django/contrib/admin/views/autocomplete.py
+index 11f277dd50..6f0b3e0b3e 100644
+--- a/django/contrib/admin/views/autocomplete.py
++++ b/django/contrib/admin/views/autocomplete.py
+@@ -29,11 +29,7 @@ class AutocompleteJsonView(BaseListView):
+         self.paginator_class = self.model_admin.paginator
+         self.object_list = self.get_queryset()
+         context = self.get_context_data()
+-        return JsonResponse({
+-            'results': [
+-                {'id': str(obj.pk), 'text': str(obj)}
+-                for obj in context['object_list']
+-            ],
++        return JsonResponse({
++            'results': [self.serialize_result(obj) for obj in context['object_list']],
+             'pagination': {'more': context['page_obj'].has_next()},
+         })
+ 
+@@ -52,3 +48,10 @@ class AutocompleteJsonView(BaseListView):
+     def has_perm(self, request, obj=None):
+         """Check if user has permission to access the related model."""
+         return self.model_admin.has_view_permission(request, obj=obj)
++
++    def serialize_result(self, obj):
++        """
++        Convert the provided object to a dictionary that is added to the results
++        list in the JSON response.
++        """
++        return {'id': str(obj.pk), 'text': str(obj)}
+diff --git a/tests/admin_views/test_autocomplete_view.py b/tests/admin_views/test_autocomplete_view.py
+index 1234567890..abcdef1234 100644
+--- a/tests/admin_views/test_autocomplete_view.py
++++ b/tests/admin_views/test_autocomplete_view.py
+@@ -60,6 +60,24 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
+             'pagination': {'more': False},
+         })
+ 
++    def test_serialize_result(self):
++        """
++        serialize_result() can be overridden to add extra fields to the
++        autocomplete results.
++        """
++        class CustomAutocompleteJsonView(AutocompleteJsonView):
++            def serialize_result(self, obj):
++                result = super().serialize_result(obj)
++                result['extra'] = 'extra data'
++                return result
++
++        q = Question.objects.create(question='Is this a question?')
++        request = self.factory.get(self.url, {'term': 'is'})
++        request.user = self.superuser
++        response = CustomAutocompleteJsonView.as_view(**self.as_view_args)(request)
++        self.assertEqual(response.status_code, 200)
++        data = json.loads(response.content.decode('utf-8'))
++        self.assertEqual(data['results'][0]['extra'], 'extra data')
++
+     def test_must_be_logged_in(self):
+         response = self.client.get(self.url, {'term': ''})
+         self.assertEqual(response.status_code, 200)

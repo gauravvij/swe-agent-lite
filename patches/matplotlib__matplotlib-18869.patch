@@ -1,0 +1,8 @@
+--- a/lib/matplotlib/__init__.py
++++ b/lib/matplotlib/__init__.py
+@@ -100,6 +100,9 @@
+ __version__ = '3.5.0'
++version_info = tuple(int(x) if x.isdigit() else x for x in __version__.split('.'))
++
+ 
+ def _check_versions():

@@ -1,0 +1,13 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -...,... @@ class QuerySet:
+     def distinct(self, *field_names):
+         """
+         Return a new QuerySet instance that will select only distinct results.
+         """
++        if field_names:
++            self._not_support_combined_queries('distinct(*field_names)')
+         clone = self._chain()
+         clone.query.add_distinct_fields(*field_names)
+         return clone

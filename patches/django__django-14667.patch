@@ -1,0 +1,18 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -XXX,XXX +XXX,XXX @@ class Query:
+         existing, defer = self.deferred_loading
+         if defer:
+             existing.update(field_names)
+         else:
+-            # We're only loading a subset of fields, so we need to remove
+-            # the deferred fields from the set of fields to load.
++            # Remove the deferred fields from the only-load list.
+             existing.difference_update(field_names)
+-            # If we've removed all fields from the only-load list, we should
+-            # switch to deferring nothing (which means load everything).
+-            if not existing:
+-                self.deferred_loading = (set(), True)
+-                return
+         self.deferred_loading = (existing, defer)

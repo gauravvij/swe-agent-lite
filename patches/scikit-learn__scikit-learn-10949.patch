@@ -1,0 +1,26 @@
+--- a/sklearn/utils/validation.py
++++ b/sklearn/utils/validation.py
+@@ -400,6 +400,11 @@ def check_array(array, accept_sparse=False, accept_large_sparse=True,
+     if isinstance(dtype, (list, tuple)):
+         dtype = dtype[0]
+ 
++    # Store the original dtype for data conversion warning
++    dtype_orig = getattr(array, "dtype", None)
++    if hasattr(array, "values"):
++        dtype_orig = array.values.dtype
++
+     if hasattr(array, "values"):
+         array = array.values
+ 
+@@ -450,9 +455,9 @@ def check_array(array, accept_sparse=False, accept_large_sparse=True,
+                              " a minimum of %d is required%s."
+                              % (n_samples, ensure_min_samples, context))
+ 
+     if warn_on_dtype:
+-        if hasattr(array, 'dtype') and array.dtype != dtype:
++        if dtype_orig is not None and array.dtype != dtype_orig:
+             warnings.warn("Data with input dtype %s was converted to %s."
+-                          % (array.dtype, dtype), DataConversionWarning)
++                          % (dtype_orig, array.dtype), DataConversionWarning)
+ 
+     return array

@@ -1,0 +1,20 @@
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -3728,6 +3728,8 @@ class _AxesBase(martist.Artist):
+             for other in self._shared_x_axes.get_siblings(self):
+                 if other is not self:
+                     other.set_xlim(self.viewLim.intervalx,
+                                    emit=False, auto=auto)
++                    other.callbacks.process('xlim_changed', other)
+ 
+         self.stale = True
+         return xmin, xmax
+@@ -3770,6 +3772,8 @@ class _AxesBase(martist.Artist):
+             for other in self._shared_y_axes.get_siblings(self):
+                 if other is not self:
+                     other.set_ylim(self.viewLim.intervaly,
+                                    emit=False, auto=auto)
++                    other.callbacks.process('ylim_changed', other)
+ 
+         self.stale = True
+         return ymin, ymax

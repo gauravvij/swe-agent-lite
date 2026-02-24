@@ -1,0 +1,25 @@
+diff --git a/django/db/models/fields/related.py b/django/db/models/fields/related.py
+--- a/django/db/models/fields/related.py
++++ b/django/db/models/fields/related.py
+@@ -1633,7 +1633,7 @@ class ManyToManyField(RelatedField):
+                     errors.append(
+                         checks.Error(
+                             hint=(
+                                 'If you want to create a recursive relationship, '
+-                                'use ForeignKey("%s", symmetrical=False, through="%s").'
++                                'use ManyToManyField("%s", through="%s").'
+                             ) % (
+                                 RECURSIVE_RELATIONSHIP_CONSTANT,
+                                 relationship_model_name,
+diff --git a/tests/invalid_models_tests/test_relative_fields.py b/tests/invalid_models_tests/test_relative_fields.py
+--- a/tests/invalid_models_tests/test_relative_fields.py
++++ b/tests/invalid_models_tests/test_relative_fields.py
+@@ -345,7 +345,7 @@ class ManyToManyFieldTests(SimpleTestCase):
+                 'field': 'm2m',
+                 'hint': (
+                     'If you want to create a recursive relationship, '
+-                    'use ForeignKey("self", symmetrical=False, through="ThroughModel").'
++                    'use ManyToManyField("self", through="ThroughModel").'
+                 ),
+             }
+         ])

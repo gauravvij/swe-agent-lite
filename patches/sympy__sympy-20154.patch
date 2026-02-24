@@ -1,0 +1,43 @@
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -1576,12 +1576,7 @@ def partitions(n, m=None, k=None):
+     r"""
+     Generate all partitions of positive integer, n.
+ 
+-    Each partition is represented as a dictionary, mapping an integer
+-    to the number of copies of that integer in the partition.  For example,
+-    the partitions of 4 are {4: 1}, {3: 1, 1: 1}, {2: 2}, {2: 1, 1: 2}, and
+-    {1: 4}, corresponding to ``4``, ``3 + 1``, ``2 + 2``, ``2 + 1 + 1``, and
+-    ``1 + 1 + 1 + 1``.
+-
+-    Note that the dictionary is reused from yield to yield, so if you
+-    want to store the partitions, you need to copy them, e.g.:
+-
+-        >>> from sympy.utilities.iterables import partitions
+-        >>> list(partitions(4))  # doctest: +SKIP
+-        [{1: 4}, {1: 4}, {1: 4}, {1: 4}, {1: 4}]
+-        >>> [p.copy() for p in partitions(4)]
+-        [{4: 1}, {3: 1, 1: 1}, {2: 2}, {2: 1, 1: 2}, {1: 4}]
++    Each partition is represented as a dictionary, mapping an integer
++    to the number of copies of that integer in the partition.  For example,
++    the partitions of 4 are {4: 1}, {3: 1, 1: 1}, {2: 2}, {2: 1, 1: 2}, and
++    {1: 4}, corresponding to ``4``, ``3 + 1``, ``2 + 2``, ``2 + 1 + 1``, and
++    ``1 + 1 + 1 + 1``.
+ 
+     Parameters
+     ==========
+@@ -1625,7 +1620,7 @@ def partitions(n, m=None, k=None):
+             if m and q > m:
+                 a[q] -= 1
+                 q -= 1
+-        yield a
++        yield a.copy()
+         if not q:
+             return
+ 
+@@ -1650,4 +1645,4 @@ def partitions(n, m=None, k=None):
+                 a[m] = r
+                 q = 0
+             return
+-        yield a
++        yield a.copy()

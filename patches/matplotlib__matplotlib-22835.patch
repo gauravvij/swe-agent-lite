@@ -1,0 +1,15 @@
+--- a/lib/matplotlib/artist.py
++++ b/lib/matplotlib/artist.py
+@@ -1279,9 +1279,13 @@ class ScalarMappable:
+             return ""
+-        neighbors = self.norm.inverse(
+-            (self.norm(data) + np.array([-.1, .1])).clip(0, 1)
+-        )
++        try:
++            neighbors = self.norm.inverse(
++                (self.norm(data) + np.array([-.1, .1])).clip(0, 1)
++            )
++        except ValueError:
++            # Some norms (e.g. BoundaryNorm) are not invertible.
++            return "[{:-#.{}g}]".format(data, g_sig_fig)
+         delta = abs(neighbors - data).max()

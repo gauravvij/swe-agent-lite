@@ -1,0 +1,51 @@
+diff --git a/django/core/checks/translation.py b/django/core/checks/translation.py
+--- a/django/core/checks/translation.py
++++ b/django/core/checks/translation.py
+@@ -39,7 +39,13 @@ def check_language_code_consistency(app_configs, **kwargs):
+     """
+     from django.conf import settings
+ 
+-    if settings.LANGUAGE_CODE not in [lang[0] for lang in settings.LANGUAGES]:
++    available_languages = {lang[0] for lang in settings.LANGUAGES}
++    if settings.LANGUAGE_CODE not in available_languages:
++        # If the exact language code is not available, check for the base language.
++        # For example, if LANGUAGE_CODE is 'de-at', check if 'de' is available.
++        base_code = settings.LANGUAGE_CODE.split('-')[0]
++        if base_code in available_languages:
++            return []
+         return [Error(
+             "You have provided a value for the LANGUAGE_CODE setting that is not in the LANGUAGES setting.",
+             id="translation.E004",
+diff --git a/tests/i18n/tests.py b/tests/i18n/tests.py
+--- a/tests/i18n/tests.py
++++ b/tests/i18n/tests.py
+@@ -1,6 +1,8 @@
+ import os
+ import unittest
+ from contextlib import contextmanager
++from django.core.checks import Error
++from django.core.checks.translation import check_language_code_consistency
+ 
+ from django.test import SimpleTestCase, override_settings
+ 
+@@ -10,3 +12,20 @@ class TranslationTests(SimpleTestCase):
+     def test_basic(self):
+         # existing tests...
+         pass
++
++    @override_settings(LANGUAGE_CODE='de-at', LANGUAGES=[('de', 'German')])
++    def test_sublanguage_with_base_language_available(self):
++        """A sublanguage (e.g., de-at) is valid if the base language (de) is in LANGUAGES."""
++        errors = check_language_code_consistency(None)
++        self.assertEqual(errors, [])
++
++    @override_settings(LANGUAGE_CODE='de-at', LANGUAGES=[('en', 'English')])
++    def test_sublanguage_without_base_language_available(self):
++        """A sublanguage is invalid if neither it nor its base language is in LANGUAGES."""
++        errors = check_language_code_consistency(None)
++        self.assertEqual(errors, [
++            Error(
++                "You have provided a value for the LANGUAGE_CODE setting that is not in the LANGUAGES setting.",
++                id="translation.E004",
++            )
++        ])

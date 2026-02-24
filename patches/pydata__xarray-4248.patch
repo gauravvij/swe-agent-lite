@@ -1,0 +1,35 @@
+--- a/xarray/core/formatting.py
++++ b/xarray/core/formatting.py
+@@ -241,6 +241,10 @@ def summarize_variable(name, var, col_width, marker=" ", max_width=None):
+     if max_width is None:
+         max_width = OPTIONS["display_width"]
+ 
++    # Show units in repr if available
++    if var.attrs.get("units"):
++        name = f"{name}, in {var.attrs['units']}"
++
+     first_col = pretty_print(f"  {marker} {name}", col_width)
+     if var.dims:
+         dims_str = f"({', '.join(map(str, var.dims))})"
+--- a/xarray/tests/test_dataarray.py
++++ b/xarray/tests/test_dataarray.py
+@@ -74,6 +74,20 @@ def test_repr_multiindex_long(self):
+         )
+         assert expected == repr(mda_long)
+ 
++    def test_repr_with_units(self):
++        # Test that units are displayed in the repr
++        v = Variable(["time", "x"], [[1, 2, 3], [4, 5, 6]], {"units": "meters"})
++        coords = {"x": ("x", [0, 1, 2], {"units": "degrees"})}
++        data_array = DataArray(v, coords, name="my_variable")
++        repr_str = repr(data_array)
++        # Check that units appear in the repr
++        assert "meters" in repr_str
++        assert "degrees" in repr_str
++        # Check the specific formatting "name, in units"
++        assert "my_variable, in meters" in repr_str
++        assert "x, in degrees" in repr_str
++
+     def test_properties(self):
+         assert_equal(self.dv.variable, self.v)
+         assert_array_equal(self.dv.values, self.v.values)

@@ -1,0 +1,63 @@
+diff --git a/sklearn/model_selection/_split.py b/sklearn/model_selection/_split.py
+--- a/sklearn/model_selection/_split.py
++++ b/sklearn/model_selection/_split.py
+@@ -62,6 +62,32 @@ class BaseCrossValidator(with_metaclass(ABCMeta)):
+     def __init__(self):
+         # We need this for the build_repr to work properly in py2.7
+         # see #6304
+         pass
+ 
++    def get_params(self, deep=True):
++        # Get parameters for this estimator.
++        out = dict()
++        for key in self._get_param_names():
++            value = getattr(self, key, None)
++            if deep and hasattr(value, 'get_params'):
++                deep_items = value.get_params().items()
++                out.update((key + '__' + k, val) for k, val in deep_items)
++            out[key] = value
++        return out
++
++    def _get_param_names(cls):
++        # Get the parameter names for the estimator
++        init = getattr(cls.__init__, 'deprecated_original', cls.__init__)
++        if init is object.__init__:
++            return []
++        init_signature = signature(init)
++        parameters = [p for p in init_signature.parameters.values()
++                      if p.name != 'self' and p.kind != p.VAR_KEYWORD]
++        for p in parameters:
++            if p.kind == p.VAR_POSITIONAL:
++                raise RuntimeError("scikit-learn estimators should always "
++                                   "specify their parameters in the signature"
++                                   " of their __init__ (no varargs).")
++        return sorted([p.name for p in parameters])
++
++    _get_param_names = classmethod(_get_param_names)
++
+     def split(self, X, y=None, groups=None):
+         """Generate indices to split data into training and test set.
+ 
+@@ -101,6 +127,9 @@ class BaseCrossValidator(with_metaclass(ABCMeta)):
+         """
+         return self._iter_test_masks(X, y, groups)
+ 
++    def __repr__(self):
++        return _build_repr(self)
++
+     def _iter_test_masks(self, X=None, y=None, groups=None):
+         """Generates boolean masks corresponding to test sets.
+ 
+@@ -164,6 +193,13 @@ class BaseCrossValidator(with_metaclass(ABCMeta)):
+         return self.get_n_splits(X, y, groups)
+ 
+ 
++def _build_repr(self):
++    # This is copied from BaseEstimator's __repr__
++    class_name = self.__class__.__name__
++    return '%s(%s)' % (class_name, _pprint(self.get_params(deep=False),
++                                           offset=len(class_name),),)
++
++
+ class _BaseKFold(BaseCrossValidator):
+     """Base class for KFold and StratifiedKFold"""

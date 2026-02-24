@@ -1,0 +1,17 @@
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -120,9 +120,15 @@ def uniq(seq):
+     """
+     Yield unique elements from ``seq`` as an iterator.
+     """
+     seen = set()
++    try:
++        size = len(seq)
++    except TypeError:
++        size = None
+     for item in seq:
++        if size is not None and len(seq) != size:
++            raise RuntimeError("sequence changed size during iteration")
+         if item not in seen:
+             seen.add(item)
+             yield item

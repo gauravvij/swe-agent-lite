@@ -1,0 +1,17 @@
+--- a/sympy/geometry/util.py
++++ b/sympy/geometry/util.py
+@@ -570,8 +570,13 @@ def idiff(eq, y, x, n=1):
+     """
+     from sympy.core.symbol import Symbol, Dummy
+     from sympy.core.function import Derivative
++    from sympy.core.relational import Eq
+     from sympy.solvers.solvers import solve
+ 
++    if isinstance(eq, Eq):
++        eq = eq.lhs - eq.rhs
++
+-    if not isinstance(y, Symbol):
++    if not (isinstance(y, Symbol) or x in y.free_symbols):
+         raise ValueError("expecting x-dependent symbol(s) but got: %s" % y)
+ 
+     dydx = Dummy('dydx')

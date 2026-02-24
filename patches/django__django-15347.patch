@@ -1,0 +1,33 @@
+diff --git a/django/contrib/messages/storage/cookie.py b/django/contrib/messages/storage/cookie.py
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ -20,7 +20,7 @@ def default(self, obj):
+             # Using 0/1 here instead of False/True to produce more compact json
+             is_safedata = 1 if isinstance(obj.message, SafeData) else 0
+             message = [self.message_key, is_safedata, obj.level, obj.message]
+-            if obj.extra_tags:
++            if obj.extra_tags is not None:
+                 message.append(obj.extra_tags)
+             return message
+         return super().default(obj)
+diff --git a/tests/messages_tests/test_cookie.py b/tests/messages_tests/test_cookie.py
+--- a/tests/messages_tests/test_cookie.py
++++ b/tests/messages_tests/test_cookie.py
+@@ -175,6 +175,17 @@ def test_message_decoder_with_extra_tags(self):
+         decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
+         self.assertEqual(messages, decoded_messages)
+ 
++    def test_message_encoder_empty_extra_tags(self):
++        """
++        MessageEncoder preserves empty string extra_tags (doesn't convert to None).
++        Regression test for #32951.
++        """
++        original_message = Message(10, "Here is a message", extra_tags="")
++        encoded_message = MessageEncoder().encode(original_message)
++        decoded_message = MessageDecoder().decode(encoded_message)
++        self.assertEqual(decoded_message.extra_tags, "")
++        self.assertIsNotNone(decoded_message.extra_tags)
++
+ 
+ class CookieStorageTests(BaseTests, SimpleTestCase):
+     storage_class = CookieStorage

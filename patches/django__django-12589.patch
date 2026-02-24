@@ -1,0 +1,24 @@
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -...,... @@
+     def get_group_by(self, select, order_by):
+         """
+         Return a list of 2-tuples of the form (sql, params).
+         The logic of what exactly the GROUP BY clause contains is hard
+         to understand, but it checks if there is a reference to a select
+         column or an order by column.
+         """
+         # ...
+         for expr in expressions:
+             if isinstance(expr, Ref):
+-                expr = select[expr.refs]
++                # Resolve the reference to the actual select expression
++                # to avoid ambiguous column references when the annotation
++                # name matches a field name from a joined table.
++                select_expr = select[expr.refs]
++                sql, params = self.compile(select_expr)
++                group_by.append((sql, params))
++                continue
+             sql, params = self.compile(expr)
+             group_by.append((sql, params))
+         return group_by

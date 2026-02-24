@@ -1,0 +1,11 @@
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -100,7 +100,7 @@ class SQLCompiler:
+         if self.query.group_by is not None:
+             group_by = self.query.group_by
+         else:
+-            group_by = self.get_group_by()
++            group_by = [] if subquery else self.get_group_by()
+ 
+         where, w_params = self.compile(self.where) if self.where is not None else ("", [])
+         having, h_params = self.compile(self.having) if self.having is not None else ("", [])

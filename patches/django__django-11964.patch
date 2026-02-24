@@ -1,0 +1,32 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1,5 +1,6 @@
+ import collections.abc
+ import copy
++import enum
+ import warnings
+ from contextlib import contextmanager
+ 
+@@ -1054,6 +1055,9 @@ class IntegerField(Field):
+     def to_python(self, value):
+         if value is None:
+             return value
++        # Handle IntegerChoices enum members
++        if isinstance(value, enum.Enum):
++            return value.value
+         try:
+             return int(value)
+         except (TypeError, ValueError):
+@@ -1719,8 +1723,12 @@ class CharField(Field):
+         return super().formfield(**defaults)
+ 
+     def to_python(self, value):
++        if value is None:
++            return value
++        # Handle TextChoices enum members
++        if isinstance(value, enum.Enum):
++            return value.value
+         if isinstance(value, str) or value is None:
+             return value
+         return str(value)

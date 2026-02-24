@@ -1,0 +1,14 @@
+diff --git a/xarray/core/dataarray.py b/xarray/core/dataarray.py
+index 1234567..abcdefg 100644
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -1234,7 +1234,9 @@ class DataArray(AbstractArray, DataArrayArithmetic, DataArrayAggregations):
+         Dataset
+         """
+         coord = self.coords[dim]
+-        return Dataset({
++        # Drop the dimension coordinate to avoid conflicts during merge
++        return Dataset({
+             name: self.sel({dim: name}).drop_vars(dim)
+             for name in coord.values
+         })

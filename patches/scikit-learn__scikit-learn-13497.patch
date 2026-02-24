@@ -1,0 +1,21 @@
+diff --git a/sklearn/feature_selection/mutual_info_.py b/sklearn/feature_selection/mutual_info_.py
+--- a/sklearn/feature_selection/mutual_info_.py
++++ b/sklearn/feature_selection/mutual_info_.py
+@@ -6,7 +6,7 @@ import numpy as np
+ from scipy.sparse import issparse
+ from scipy.special import digamma
+ 
+-from ..externals.six import moves
++from ..externals.six import moves, string_types
+ from ..metrics.cluster.supervised import mutual_info_score
+ from ..neighbors import NearestNeighbors
+ from ..preprocessing import scale
+@@ -240,7 +240,7 @@ def _estimate_mi(X, y, discrete_features='auto', discrete_target=False,
+     X, y = check_X_y(X, y, accept_sparse='csc', y_numeric=not discrete_target)
+     n_samples, n_features = X.shape
+ 
+-    if discrete_features == 'auto':
++    if isinstance(discrete_features, string_types) and discrete_features == 'auto':
+         discrete_features = issparse(X)
+ 
+     if isinstance(discrete_features, bool):

@@ -1,0 +1,25 @@
+diff --git a/src/_pytest/tmpdir.py b/src/_pytest/tmpdir.py
+--- a/src/_pytest/tmpdir.py
++++ b/src/_pytest/tmpdir.py
+@@ -...,... @@
+ def get_user() -> str:
+     """Return the current user name, or a fallback string if it cannot be determined."""
+     import getpass
+-    return getpass.getuser()
++    user = getpass.getuser()
++    # Replace characters that are illegal in directory names on Windows
++    # These are: \ / : * ? " < > |
++    for char in '\\/:*?"<>|':
++        user = user.replace(char, '_')
++    return user
+
+diff --git a/testing/test_tmpdir.py b/testing/test_tmpdir.py
+--- a/testing/test_tmpdir.py
++++ b/testing/test_tmpdir.py
+@@ -...,... @@
++def test_get_user_sanitizes_illegal_characters(monkeypatch: MonkeyPatch) -> None:
++    """Test that get_user sanitizes characters illegal in directory names."""
++    import getpass
++    monkeypatch.setattr(getpass, "getuser", lambda: "domain\\user")
++    result = get_user()
++    assert result == "domain_user"

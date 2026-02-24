@@ -1,0 +1,22 @@
+diff --git a/sklearn/utils/multiclass.py b/sklearn/utils/multiclass.py
+index 123456789..abcdef123 100644
+--- a/sklearn/utils/multiclass.py
++++ b/sklearn/utils/multiclass.py
+@@ -280,7 +280,16 @@ def type_of_target(y):
+     if y.ndim == 2 and y.shape[1] == 0:
+         return "unknown"
+ 
+-    y = np.asarray(y)
++    # Handle pandas nullable dtypes by converting to numpy dtypes if possible
++    if hasattr(y, 'dtype') and hasattr(y.dtype, 'numpy_dtype'):
++        # y is a pandas Series with an ExtensionDtype (like Int64, Float64, boolean)
++        try:
++            y = np.asarray(y, dtype=y.dtype.numpy_dtype)
++        except (ValueError, TypeError):
++            # Conversion failed (e.g., due to NA values), fall back to object array
++            y = np.asarray(y)
++    else:
++        y = np.asarray(y)
+ 
+     # The old type of target for binary is 'binary'. The new type of target
+     # for binary is 'multiclass' if the target is 2d, otherwise 'binary'.

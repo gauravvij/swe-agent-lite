@@ -1,0 +1,14 @@
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -269,6 +269,11 @@ class BaseLibSVM(six.with_metaclass(ABCMeta, BaseEstimator)):
+ 
+         n_SV = self.support_.shape[0]
+ 
++        # Handle empty support vectors
++        if n_SV == 0:
++            self.dual_coef_ = sp.csr_matrix([])
++            return
++
+         dual_coef_indices = np.tile(np.arange(n_SV), n_class)
+         dual_coef_indptr = np.arange(0, dual_coef_indices.size + 1,
+                                      dual_coef_indices.size / n_class)

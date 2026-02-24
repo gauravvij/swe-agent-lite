@@ -1,0 +1,9 @@
+diff --git a/django/db/migrations/serializer.py b/django/db/migrations/serializer.py
+--- a/django/db/migrations/serializer.py
++++ b/django/db/migrations/serializer.py
+@@ -65,7 +65,7 @@ class FunctionSerializer(BaseSerializer):
+         elif inspect.ismethod(self.value):
+             # Bound method
+             klass = self.value.__self__
+-            return "%s.%s.%s" % (klass.__module__, klass.__name__, self.value.__name__), ...
++            return "%s.%s.%s" % (klass.__module__, klass.__qualname__, self.value.__name__), ...

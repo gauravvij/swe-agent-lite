@@ -1,0 +1,41 @@
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -54,6 +54,10 @@ class ManagementForm(Form):
+     """
+     Keep track of how many form instances are displayed on the page. If adding
+     new forms via JavaScript, you should increment the count fields in this
++    form.
++
++    Explicitly set the template name to avoid deprecation warnings since
++    ManagementForm only contains hidden inputs.
+     """
++    template_name = "django/forms/default.html"
+     TOTAL_FORMS = IntegerField(widget=HiddenInput)
+     INITIAL_FORMS = IntegerField(widget=HiddenInput)
+     # MIN_NUM_FORMS and MAX_NUM_FORMS are required to be integers in order
+--- a/tests/forms_tests/tests/test_formsets.py
++++ b/tests/forms_tests/tests/test_formsets.py
+@@ -1,5 +1,6 @@
+ import datetime
+ from collections import Counter
++import warnings
+ from unittest import mock
+ 
+ from django.forms import (
+@@ -85,3 +86,15 @@ class FormsFormsetTestCase(SimpleTestCase):
+ 
+     def test_form_kwargs_formset(self):
+         """
+         Custom
++        """
++
++    def test_management_form_no_default_template_warning(self):
++        """
++        ManagementForm shouldn't raise a deprecation warning about using the
++        default template since it's only hidden inputs.
++        """
++        with warnings.catch_warnings(record=True) as w:
++            warnings.simplefilter("always")
++            formset = ChoiceFormSet()
++            str(formset.management_form)
++            self.assertEqual(len([x for x in w if 'default' in str(x.message)]), 0)

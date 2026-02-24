@@ -1,0 +1,9 @@
+--- a/src/_pytest/assertion/rewrite.py
++++ b/src/_pytest/assertion/rewrite.py
+@@ -743,7 +743,7 @@ class AssertionRewritingHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+         if isinstance(docstring, ast.Constant):
+             docstring = docstring.value
+         elif isinstance(docstring, ast.Str):
+             docstring = docstring.s
+-        return "PYTEST_DONT_REWRITE" in docstring
++        return isinstance(docstring, str) and "PYTEST_DONT_REWRITE" in docstring

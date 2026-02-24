@@ -1,0 +1,11 @@
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,7 +825,7 @@
+         for item in items:
+             pform = self._print(item)
+             if items.index(item) > 0:
+-                if S(item.args[0]).is_negative:
++                if _coeff_isneg(item):
+                     pform = prettyForm(*pform.left(' '))
+                 else:
+                     pform = prettyForm(*pform.left(' + '))

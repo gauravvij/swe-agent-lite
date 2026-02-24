@@ -1,0 +1,13 @@
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1220,6 +1220,10 @@ class WCS(WCSBase, FITSWCSAPIMixin):
+         def _return_list_of_arrays(axes, origin):
+             if ra_dec_order and sky == 'input':
+                 xy = self._denormalize_sky(xy)
++
++            if xy.size == 0:
++                return [np.array([]) for _ in range(self.naxis)]
++
+             output = func(xy, origin)
+             if ra_dec_order and sky == 'output':
+                 output = self._normalize_sky(output)

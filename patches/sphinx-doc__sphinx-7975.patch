@@ -1,0 +1,29 @@
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -82,11 +82,21 @@ class IndexEntries:
+         # target sort key function
+         keyfunc = self._key_func_english if self._language == 'en' else self._key_func
+         entries = sorted(entries, key=keyfunc)
+-        # sort by index key
+-        entries = sorted(entries, key=lambda e: e[0].upper())
+ 
+-        for letter, group in groupby(entries, keyfunc):
+-            if not letter.isalpha():
++        # sort by first character: symbols first, then letters
++        def sort_key(e):
++            c = e[0].upper()
++            return (c.isalpha(), c)
++        
++        def group_key(e):
++            c = e[0].upper()
++            return (c.isalpha(), c if c.isalpha() else '')
++        
++        entries = sorted(entries, key=sort_key)
++
++        for key, group in groupby(entries, group_key):
++            if not key[0]:
+                 letter = _('Symbols')
+             else:
+-                letter = letter
++                letter = key[1]
+             yield letter, list(group)

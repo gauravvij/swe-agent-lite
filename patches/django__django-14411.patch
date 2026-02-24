@@ -1,0 +1,26 @@
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index 3f21d2156b..8f5d7e7c9a 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -58,6 +58,7 @@ class UserCreationForm(forms.ModelForm):
+ 
+ class ReadOnlyPasswordHashWidget(forms.Widget):
+     template_name = 'auth/widgets/read_only_password_hash.html'
++    id_for_label = None
+ 
+     def get_context(self, name, value, attrs):
+         context = super().get_context(name, value, attrs)
+diff --git a/tests/auth_tests/test_forms.py b/tests/auth_tests/test_forms.py
+index 123456789a..9876543210 100644
+--- a/tests/auth_tests/test_forms.py
++++ b/tests/auth_tests/test_forms.py
+@@ -910,6 +910,10 @@ class ReadOnlyPasswordHashFieldTest(TestDataMixin, TestCase):
+         self.assertIn('*****', rendered)
+         self.assertIn('Set password', rendered)
+ 
++    def test_read_only_password_hash_widget_id_for_label(self):
++        widget = ReadOnlyPasswordHashWidget()
++        self.assertIsNone(widget.id_for_label)
++
+ 
+ class PasswordResetFormTest(TestDataMixin, TestCase):

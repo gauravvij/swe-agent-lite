@@ -1,0 +1,13 @@
+--- a/django/urls/resolvers.py
++++ b/django/urls/resolvers.py
+@@ -343,6 +343,9 @@ class URLResolver:
+                 try:
+                     sub_match = pattern.resolve(new_path)
+                 except Resolver404 as e:
+                     self._add_sub_tried(tried, pattern, e)
++                except Http404:
++                    # Raise Http404 from path converter to_python method
++                    raise
+                 else:
+                     if sub_match:
+                         # ...

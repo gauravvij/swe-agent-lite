@@ -1,0 +1,22 @@
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -...,... @@
+     def add_directive_header(self, sig: str) -> None:
+         super().add_directive_header(sig)
+         if self.object_annotation:
+-            self.add_line('   :annotation: %s' % self.object_annotation, self.get_sourcename())
++            annotation = self.object_annotation
++            if self.env.config.autodoc_type_aliases:
++                for alias, full_name in self.env.config.autodoc_type_aliases.items():
++                    annotation = re.sub(r'\b%s\b' % re.escape(alias), full_name, annotation)
++            self.add_line('   :annotation: %s' % annotation, self.get_sourcename())
+@@ -...,... @@
+     def add_directive_header(self, sig: str) -> None:
+         super().add_directive_header(sig)
+         if self.object_annotation:
+-            self.add_line('   :annotation: %s' % self.object_annotation, self.get_sourcename())
++            annotation = self.object_annotation
++            if self.env.config.autodoc_type_aliases:
++                for alias, full_name in self.env.config.autodoc_type_aliases.items():
++                    annotation = re.sub(r'\b%s\b' % re.escape(alias), full_name, annotation)
++            self.add_line('   :annotation: %s' % annotation, self.get_sourcename())

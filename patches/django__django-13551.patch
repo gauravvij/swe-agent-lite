@@ -1,0 +1,40 @@
+diff --git a/django/contrib/auth/tokens.py b/django/contrib/auth/tokens.py
+--- a/django/contrib/auth/tokens.py
++++ b/django/contrib/auth/tokens.py
+@@ -50,7 +50,10 @@ class PasswordResetTokenGenerator:
+     def _make_hash_value(self, user, timestamp):
+         # Ensure results are consistent across DB backends
+         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
+-        return str(user.pk) + user.password + str(login_timestamp) + str(timestamp)
++        # Include user email to invalidate tokens when email changes.
++        # Handle users without email fields or with None values.
++        email = getattr(user, 'email', '') or ''
++        return str(user.pk) + user.password + str(login_timestamp) + str(timestamp) + email
+ 
+ 
+ default_token_generator = PasswordResetTokenGenerator()
+diff --git a/tests/auth_tests/test_tokens.py b/tests/auth_tests/test_tokens.py
+--- a/tests/auth_tests/test_tokens.py
++++ b/tests/auth_tests/test_tokens.py
+@@ -45,3 +45,21 @@ class TokenGeneratorTest(TestCase):
+         p1 = PasswordResetTokenGenerator()
+         tk1 = p1.make_token(user)
+         self.assertEqual(tk0, tk1)
++
++    def test_token_invalid_after_email_change(self):
++        """
++        Changing a user's email address invalidates existing password reset tokens.
++        """
++        user = User.objects.create_user('testuser', 'test@example.com', 'testpass')
++        p0 = PasswordResetTokenGenerator()
++        tk0 = p0.make_token(user)
++        self.assertTrue(p0.check_token(user, tk0))
++        
++        # Change the email and save
++        user.email = 'newemail@example.com'
++        user.save()
++        self.assertFalse(p0.check_token(user, tk0))
++        
++        # New token should work with new email
++        tk1 = p0.make_token(user)
++        self.assertTrue(p0.check_token(user, tk1))

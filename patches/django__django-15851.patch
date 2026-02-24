@@ -1,0 +1,12 @@
+--- a/django/db/backends/postgresql/client.py
++++ b/django/db/backends/postgresql/client.py
+@@ -33,9 +33,9 @@ class DatabaseClient(BaseDatabaseClient):
+             args += ['-U', user]
+         if passwd:
+             args += ['-W']
+-        args += [dbname]
+         if options:
+             args += options
++        args += [dbname]
+         args.extend(parameters)
+         subprocess.run(args, check=True)

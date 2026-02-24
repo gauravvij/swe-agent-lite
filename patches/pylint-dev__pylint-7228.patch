@@ -1,0 +1,15 @@
+--- a/pylint/config/argument.py
++++ b/pylint/config/argument.py
+@@ -48,7 +48,11 @@ def _regexp(value: str) -> Pattern[str]:
+     if not value:
+         return re.compile("")
+-    return re.compile(value)
++    try:
++        return re.compile(value)
++    except re.error as exc:
++        raise argparse.ArgumentTypeError(
++            f"Invalid regular expression: {exc}"
++        ) from exc
+ 
+ 
+ def _regexp_csv(value: str) -> List[Pattern[str]]:

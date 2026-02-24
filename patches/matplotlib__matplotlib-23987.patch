@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -2416,7 +2416,8 @@ class Figure(FigureBase):
+ 
+     def subplots_adjust(self, **kwargs):
+         # docstring inherited
+-        if self.get_layout_engine() is not None:
++        if (self.get_layout_engine() is not None and
++                not self.get_layout_engine().is_compatible_with_subplots_adjust):
+             _api.warn_external(
+                 "This figure was using a layout engine that is "
+                 "incompatible with subplots_adjust and/or tight_layout; "

@@ -1,0 +1,8 @@
+--- a/src/_pytest/skipping.py
++++ b/src/_pytest/skipping.py
+@@ -232,7 +232,8 @@ def pytest_runtest_makereport(item, call):
+     if item.config.option.runxfail:
+         # Don't re-skip if already skipped to preserve location
+-        pytest.skip("unconditional skip")
++        if not (call.excinfo and call.excinfo.errisinstance(pytest.skip.Exception)):
++            pytest.skip("unconditional skip")

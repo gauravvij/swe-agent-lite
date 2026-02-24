@@ -1,0 +1,24 @@
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -472,6 +472,10 @@ class Domain(Option):
+                     return sympy.polys.domains.ZZ.poly_ring(*gens)
+                 elif base == 'QQ':
+                     return sympy.polys.domains.QQ.poly_ring(*gens)
++                elif base == 'RR':
++                    return sympy.polys.domains.RR.poly_ring(*gens)
++                elif base == 'CC':
++                    return sympy.polys.domains.CC.poly_ring(*gens)
+                 else:
+                     raise OptionError('expected a valid domain specification, got %s' % domain)
+ 
+@@ -479,7 +483,8 @@ class Domain(Option):
+                 return sympy.polys.domains.QQ.algebraic_field(*gens)
+ 
+         raise OptionError(
+-            'expected a valid domain specification, got %s' % domain)
++            'expected a valid domain specification, got %s. Valid examples include: '
++            'ZZ, QQ, RR, CC, GF(p), ZZ[x,y], QQ[x,y], RR[x,y], etc.' % domain)
+ 
+     @classmethod
+     def postprocess(cls, options):

@@ -1,0 +1,43 @@
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -25,12 +25,13 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     for engine in settings.TEMPLATES:
+         for lib_name, lib_module in engine.get('OPTIONS', {}).get('libraries', {}).items():
+             if lib_name in libraries:
+-                errors.append(Error(
+-                    "'%s' is used for multiple template tag modules: '%s', '%s'" % (
+-                        lib_name, libraries[lib_name], lib_module
+-                    ),
+-                    id='templates.E003',
+-                ))
++                if libraries[lib_name] != lib_module:
++                    errors.append(Error(
++                        "'%s' is used for multiple template tag modules: '%s', '%s'" % (
++                            lib_name, libraries[lib_name], lib_module
++                        ),
++                        id='templates.E003',
++                    ))
+             else:
+                 libraries[lib_name] = lib_module
+ 
+@@ -45,12 +46,13 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+             for filename in os.listdir(templatetags_dir):
+                 if filename.endswith('.py') and not filename.startswith('_'):
+                     module_name = '%s.templatetags.%s' % (app_config.name, filename[:-3])
+                     lib_name = filename[:-3]
+                     if lib_name in libraries:
+-                        errors.append(Error(
+-                            "'%s' is used for multiple template tag modules: '%s', '%s'" % (
+-                                lib_name, libraries[lib_name], module_name
+-                            ),
+-                            id='templates.E003',
+-                        ))
++                        if libraries[lib_name] != module_name:
++                            errors.append(Error(
++                                "'%s' is used for multiple template tag modules: '%s', '%s'" % (
++                                    lib_name, libraries[lib_name], module_name
++                                ),
++                                id='templates.E003',
++                            ))
+                     else:
+                         libraries[lib_name] = module_name

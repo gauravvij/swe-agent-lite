@@ -1,0 +1,4 @@
+--- a/seaborn/_core/scales.py
++++ b/seaborn/_core/scales.py
+@@ -347,8 +347,8 @@
+         forward, inverse = self

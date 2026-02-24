@@ -1,0 +1,19 @@
+--- a/sympy/printing/pretty/stringpict.py
++++ b/sympy/printing/pretty/stringpict.py
+@@ -28,13 +28,15 @@ class stringPict(object):
+     #special value for stringPict.below
+     LINE = 'line'
+ 
+-    def __init__(self, s, baseline=0):
++    def __init__(self, s, baseline=None):
+         """Initialize from string.
+         Multiline strings are centered.
+         """
+         self.s = s
+         #picture is a string that just can be printed
+         self.picture = stringPict.equalLengths(s.splitlines())
+         #baseline is the line number of the "base line"
++        if baseline is None:
++            baseline = len(self.picture) // 2
+         self.baseline = baseline
+         self.binding = None

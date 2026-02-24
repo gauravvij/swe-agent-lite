@@ -1,0 +1,34 @@
+diff --git a/sklearn/neighbors/base.py b/sklearn/neighbors/base.py
+--- a/sklearn/neighbors/base.py
++++ b/sklearn/neighbors/base.py
+@@ -...,... +...,... @@
+ class NeighborsBase(BaseEstimator, metaclass=ABCMeta):
+     """Base class for nearest neighbors estimators."""
+ 
+     def __init__(self, n_neighbors=5, radius=1.0, algorithm='auto',
+                  leaf_size=30, metric='minkowski', p=2,
+                  metric_params=None, n_jobs=1, **kwargs):
++        if not isinstance(n_neighbors, (int, np.integer)):
++            raise TypeError("n_neighbors must be an integer, "
++                            "got %s" % type(n_neighbors))
++        if n_neighbors <= 0:
++            raise ValueError("n_neighbors must be positive, "
++                             "got %d" % n_neighbors)
+         self.n_neighbors = n_neighbors
+         self.radius = radius
+         self.algorithm = algorithm
+@@ -...,... +...,... @@
+     def kneighbors(self, X=None, n_neighbors=None, return_distance=True):
+         """Find the K-neighbors of a point."""
+         if n_neighbors is None:
+             n_neighbors = self.n_neighbors
++        else:
++            if not isinstance(n_neighbors, (int, np.integer)):
++                raise TypeError("n_neighbors must be an integer, "
++                                "got %s" % type(n_neighbors))
++            if n_neighbors <= 0:
++                raise ValueError("n_neighbors must be positive, "
++                                 "got %d" % n_neighbors)
+         
+         # Validate n_neighbors again to ensure it's valid for the fitted data
+         n_samples_fit = self._fit_X.shape[0]

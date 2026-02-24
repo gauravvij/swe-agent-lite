@@ -1,0 +1,40 @@
+diff --git a/sklearn/preprocessing/data.py b/sklearn/preprocessing/data.py
+--- a/sklearn/preprocessing/data.py
++++ b/sklearn/preprocessing/data.py
+@@ -2148,6 +2148,12 @@ class OneHotEncoder(BaseEstimator, TransformerMixin):
+             for i in range(n_features):
+                 Xi = X[:, i]
+                 if self.handle_unknown == 'ignore':
++                    # Cast to object dtype to avoid truncation issues when
++                    # assigning placeholder values for unknown categories.
++                    # Fixed-width string arrays may truncate longer strings
++                    # assigned from self.categories_[i][0].
++                    if Xi.dtype.kind in ('U', 'S'):
++                        Xi = Xi.astype(object)
+                     Xi = Xi.copy()
+                     valid_mask = np.in1d(Xi, self.categories_[i])
+                     Xi[~valid_mask] = self.categories_[i][0]
+diff --git a/sklearn/preprocessing/tests/test_data.py b/sklearn/preprocessing/tests/test_data.py
+--- a/sklearn/preprocessing/tests/test_data.py
++++ b/sklearn/preprocessing/tests/test_data.py
+@@ -1985,6 +1985,21 @@ def test_one_hot_encoder_handle_unknown():
+     assert_raises(ValueError, oh.transform, X).message
+ 
+ 
++def test_one_hot_encoder_handle_unknown_strings():
++    # Test that handle_unknown='ignore' works with string arrays
++    # where the placeholder category may be longer than the array dtype allows
++    train = np.array(['22', '333', '4444', '11111111']).reshape((-1, 1))
++    test = np.array(['55555', '22']).reshape((-1, 1))
++    
++    oh = OneHotEncoder(handle_unknown='ignore')
++    oh.fit(train)
++    result = oh.transform(test)
++    
++    # '22' is at index 1 in categories (alphabetically: '11111111', '22', '333', '4444')
++    assert_array_equal(result.toarray(), [[0, 0, 0, 0], [0, 1, 0, 0]])
++
++
+ def test_one_hot_encoder_dtypes():
+     X = [[0, 0, 4],
+          [1, 0, 0],

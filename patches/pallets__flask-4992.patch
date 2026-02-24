@@ -1,0 +1,73 @@
+diff --git a/src/flask/config.py b/src/flask/config.py
+--- a/src/flask/config.py
++++ b/src/flask/config.py
+@@ -115,7 +115,13 @@ def from_envvar(self, variable_name: str, silent: bool = False) -> bool:
+         self.from_pyfile(os.environ[variable_name], silent=silent)
+         return True
+ 
+-    def from_file(self, filename: str, load: t.Callable[..., t.Any], silent: bool = False) -> bool:
++    def from_file(
++        self,
++        filename: str,
++        load: t.Callable[..., t.Any],
++        silent: bool = False,
++        mode: str = "t",
++    ) -> bool:
+         """Update the values in the config from a file that is loaded
+         using the `load` parameter. The loaded data is passed to the
+         :meth:`from_mapping` method.
+@@ -124,16 +130,21 @@ def from_file(self, filename: str, load: t.Callable[..., t.Any], silent: bool =
+ 
+             import json
+             app.config.from_file("config.json", json.load)
+ 
++            import tomllib
++            app.config.from_file("config.toml", tomllib.load, mode="b")
++
+         :param filename: The path to the data file. This can be an
+             absolute path or relative to the config root path.
+         :param load: A callable that takes a file handle and returns a
+             mapping of configuration keys to values.
+         :param silent: Ignore the file if it doesn't exist.
++        :param mode: The file mode to use when opening the file. Defaults
++            to ``"t"`` for text mode. Use ``"b"`` for binary mode.
+         """
+         filename = os.path.join(self.root_path, filename)
+         try:
+-            with open(filename) as f:
++            with open(filename, f"r{mode}") as f:
+                 obj = load(f)
+         except OSError as e:
+             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
+diff --git a/tests/test_config.py b/tests/test_config.py
+--- a/tests/test_config.py
++++ b/tests/test_config.py
+@@ -1,6 +1,8 @@
+ import json
+ import os
++import pickle
++import tempfile
+ import textwrap
+ from datetime import timedelta
+ 
+@@ -33,6 +35,22 @@ def test_config_from_file():
+     common_object_test(app)
+ 
+ 
++def test_config_from_file_binary():
++    app = flask.Flask(__name__)
++    # Create a temporary binary config file using pickle
++    with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
++        pickle.dump({"SECRET_KEY": "config", "TEST_KEY": "foo"}, f)
++        temp_path = f.name
++    
++    try:
++        app.config.from_file(temp_path, pickle.load, mode="b")
++        common_object_test(app)
++    finally:
++        os.unlink(temp_path)
++
++
+ def test_config_from_mapping():
+     app = flask.Flask(__name__)
+     app.config.from_mapping({"SECRET_KEY": "config", "TEST_KEY": "foo"})

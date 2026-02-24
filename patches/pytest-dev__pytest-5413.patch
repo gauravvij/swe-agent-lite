@@ -1,0 +1,12 @@
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -540,6 +540,10 @@ class ExceptionInfo:
+     def __repr__(self):
+         return "<ExceptionInfo %s tblen=%d>" % (self.value, len(self.traceback))
+ 
++    def __str__(self):
++        return str(self.value)
++
+     def match(self, regexp):
+         """
+         Match the regular expression 'regexp' on the string representation of

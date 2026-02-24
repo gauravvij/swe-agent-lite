@@ -1,0 +1,15 @@
+--- a/sympy/simplify/powsimp.py
++++ b/sympy/simplify/powsimp.py
+@@ -170,7 +170,9 @@ def powsimp(expr, deep=False, combine='all', force=False, measure=count_ops):
+                 # combine (-a)**x * a**(-x) -> (-1)**x
+                 if b.is_positive and e == -e2:
+-                    new_terms.append((S.NegativeOne, e))
+-                    continue
++                    # Don't simplify if b is a concrete number to avoid
++                    # branch cut issues with rational exponents
++                    if not b.is_number:
++                        new_terms.append((S.NegativeOne, e))
++                        continue
+                 # combine a**x * b**x -> (a*b)**x
+                 # first, check that the bases are compatible
+                 if b.is_positive or force:

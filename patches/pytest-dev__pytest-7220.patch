@@ -1,0 +1,15 @@
+diff --git a/src/_pytest/nodes.py b/src/_pytest/nodes.py
+index 1234567..89abcde 100644
+--- a/src/_pytest/nodes.py
++++ b/src/_pytest/nodes.py
+@@ -530,7 +530,12 @@ class Item(Node):
+ 
+     @property
+     def location(self):
+-        return (self.fspath, self.lineno, self.name)
++        path = self.fspath
++        # Make path relative to rootdir so it doesn't change with chdir
++        rel_path = path.relto(self.session.config.rootdir)
++        if rel_path is not None:
++            path = rel_path
++        return (path, self.lineno, self.name)

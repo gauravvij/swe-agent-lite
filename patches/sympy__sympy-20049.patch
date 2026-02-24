@@ -1,0 +1,31 @@
+--- a/sympy/physics/vector/point.py
++++ b/sympy/physics/vector/point.py
+@@ -10,6 +10,7 @@ from sympy.core.backend import S, sympify
+ from sympy.core.compatibility import string_types
+ from .vector import Vector, _check_vector
+ from .frame import ReferenceFrame, _check_frame
++from . import dynamicsymbols
+ 
+ 
+ class Point(object):
+@@ -450,10 +451,19 @@ class Point(object):
+         """
+ 
+-        if not (frame in self._vel_dict):
+-            raise ValueError('Velocity of point ' + self.name + ' has not been'
+-                             ' defined in ReferenceFrame ' + frame.name)
++        if frame in self._vel_dict:
++            return self._vel_dict[frame]
++        
++        # Try to calculate velocity from relative positions
++        for other_point, position in self._pos_dict.items():
++            try:
++                other_vel = other_point.vel(frame)
++                rel_vel = position.diff(dynamicsymbols._t, frame)
++                return other_vel + rel_vel
++            except ValueError:
++                continue
++        
++        raise ValueError('Velocity of point ' + self.name + ' has not been'
++                         ' defined in ReferenceFrame ' + frame.name)
+-        return self._vel_dict[frame]

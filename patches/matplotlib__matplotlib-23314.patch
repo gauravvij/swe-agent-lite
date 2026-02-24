@@ -1,0 +1,11 @@
+--- a/lib/mpl_toolkits/mplot3d/axes3d.py
++++ b/lib/mpl_toolkits/mplot3d/axes3d.py
+@@ -278,6 +278,9 @@ class Axes3D(Axes):
+             self._shared_axes["z"].remove(self)
+ 
+     def draw(self, renderer):
++        if not self.get_visible():
++            return
++        
+         # draw the background patch
+         self.patch.draw(renderer)

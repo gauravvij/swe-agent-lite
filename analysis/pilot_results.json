@@ -1,0 +1,167 @@
+{
+  "metrics": {
+    "single_shot": {
+      "total": 6,
+      "patches_generated": 3,
+      "valid_patches": 3,
+      "patch_rate": 0.5,
+      "valid_patch_rate": 0.5,
+      "avg_tokens": 9550.4,
+      "avg_time_sec": 92.59,
+      "errors": [
+        "Failed to clone astropy/astropy",
+        "Empty patch generated",
+        "Empty patch generated"
+      ]
+    },
+    "plan_solve": {
+      "total": 6,
+      "patches_generated": 5,
+      "valid_patches": 5,
+      "patch_rate": 0.833,
+      "valid_patch_rate": 0.833,
+      "avg_tokens": 19305.0,
+      "avg_time_sec": 205.02,
+      "errors": [
+        "Empty patch generated"
+      ]
+    }
+  },
+  "best_strategy": "plan_solve",
+  "results": {
+    "single_shot": [
+      {
+        "instance_id": "astropy__astropy-12907",
+        "patch": "",
+        "strategy": "single_shot",
+        "success": false,
+        "error": "Failed to clone astropy/astropy",
+        "elapsed_sec": 0,
+        "usage": {}
+      },
+      {
+        "instance_id": "astropy__astropy-14182",
+        "patch": "diff --git a/astropy/io/ascii/rst.py b/astropy/io/ascii/rst.py\nindex 1234567..abcdefg 100644\n--- a/astropy/io/ascii/rst.py\n+++ b/astropy/io/ascii/rst.py\n@@ -40,9 +40,10 @@ class RST(FixedWidth):\n     _format_name = \"rst\"\n     _description = \"reStructuredText simple table\"\n \n-    def __init__(self):\n+    def __init__(self, header_rows=None):\n         super().__init__(\n             delimiter_pad=None,\n             bookend=False,\n+            header_rows=header_rows,\n         )",
+        "strategy": "single_shot",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 59.63,
+        "usage": {
+          "tokens_used": 5324
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-14365",
+        "patch": "",
+        "strategy": "single_shot",
+        "success": false,
+        "error": "Empty patch generated",
+        "elapsed_sec": 141.17,
+        "usage": {
+          "tokens_used": 10086
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-6938",
+        "patch": "--- a/astropy/io/fits/fitsrec.py\n+++ b/astropy/io/fits/fitsrec.py\n@@ -813,7 +813,7 @@\n \n         # Replace exponent separator in floating point numbers\n         if 'D' in format:\n-            output_field.replace(encode_ascii('E'), encode_ascii('D'))\n+            output_field = output_field.replace(encode_ascii('E'), encode_ascii('D'))\n \n         return output_field",
+        "strategy": "single_shot",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 22.52,
+        "usage": {
+          "tokens_used": 4383
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-14995",
+        "patch": "--- a/astropy/nddata/mixins/ndarithmetic.py\n+++ b/astropy/nddata/mixins/ndarithmetic.py\n@@ -240,7 +240,14 @@ class NDArithmeticMixin(NDSlicingMixin):\n \n         # Handle the masks\n         if handle_mask is not None:\n-            result_mask = handle_mask(self.mask, operand.mask)\n+            if self.mask is None and operand.mask is None:\n+                result_mask = None\n+            elif self.mask is None:\n+                result_mask = operand.mask\n+            elif operand.mask is None:\n+                result_mask = self.mask\n+            else:\n+                result_mask = handle_mask(self.mask, operand.mask)\n         else:\n             result_mask = None",
+        "strategy": "single_shot",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 111.92,
+        "usage": {
+          "tokens_used": 14825
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-7746",
+        "patch": "",
+        "strategy": "single_shot",
+        "success": false,
+        "error": "Empty patch generated",
+        "elapsed_sec": 220.31,
+        "usage": {
+          "tokens_used": 13134
+        }
+      }
+    ],
+    "plan_solve": [
+      {
+        "instance_id": "astropy__astropy-14182",
+        "patch": "",
+        "strategy": "plan_solve",
+        "success": false,
+        "error": "Empty patch generated",
+        "elapsed_sec": 191.25,
+        "usage": {
+          "tokens_used": 12290
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-12907",
+        "patch": "diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py\n--- a/astropy/modeling/separable.py\n+++ b/astropy/modeling/separable.py\n@@ -133,6 +133,12 @@ def _separable(transform):\n     if transform.n_inputs == 1 and transform.n_outputs > 1:\n         return np.array([False] * transform.n_outputs)\n \n+    # Handle compound models by recursing into their structure\n+    if isinstance(transform, CompoundModel):\n+        left = _separable(transform.left)\n+        right = _separable(transform.right)\n+        return _operators[transform.op](left, right)\n+\n     if isinstance(transform, Mapping):\n         return _separable_mapping(transform)",
+        "strategy": "plan_solve",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 343.16,
+        "usage": {
+          "tokens_used": 29029
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-14365",
+        "patch": "--- a/astropy/io/ascii/qdp.py\n+++ b/astropy/io/ascii/qdp.py\n@@ -XX,XX +XX,XX @@\n     def _parse_line(self, line):\n         \"\"\"Parse a line from a QDP file.\"\"\"\n         line = line.strip()\n         \n+        # QDP commands are case-insensitive\n+        line_upper = line.upper()\n+        \n         # Check for READ command (specifies error columns)\n-        if line.startswith(\"READ\"):\n+        if line_upper.startswith(\"READ\"):\n             return self._parse_read_command(line)\n         \n         # Check for other commands...\n-        if line.startswith((\"TIT\", \"LAB\", \"LOG\", \"COL\")):\n+        if line_upper.startswith((\"TIT\", \"LAB\", \"LOG\", \"COL\")):\n             return self._parse_other_command(line)\n         \n         # If it starts with a letter but isn't a recognized command, it's an error\n-        if line and line[0].isalpha():\n+        if line and line_upper[0].isalpha():\n             raise ValueError(f'Unrecognized QDP line: {line}')\n         \n         return line",
+        "strategy": "plan_solve",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 175.33,
+        "usage": {
+          "tokens_used": 23673
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-14995",
+        "patch": "--- a/astropy/nddata/mixins/ndarithmetic.py\n+++ b/astropy/nddata/mixins/ndarithmetic.py\n@@ -242,7 +242,14 @@\n \n         # Handle masks\n         if handle_mask is not None:\n-            result_mask = handle_mask(self.mask, operand.mask)\n+            if self.mask is None and operand.mask is None:\n+                result_mask = None\n+            elif self.mask is None:\n+                result_mask = operand.mask.copy()\n+            elif operand.mask is None:\n+                result_mask = self.mask.copy()\n+            else:\n+                result_mask = handle_mask(self.mask, operand.mask)\n         else:\n             result_mask = None",
+        "strategy": "plan_solve",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 138.01,
+        "usage": {
+          "tokens_used": 18804
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-6938",
+        "patch": "--- a/astropy/io/fits/fitsrec.py\n+++ b/astropy/io/fits/fitsrec.py\n@@ -827,7 +827,7 @@ class FITS_rec(np.recarray):\n \n         # Replace exponent separator in floating point numbers\n         if 'D' in format:\n-            output_field.replace(encode_ascii('E'), encode_ascii('D'))\n+            output_field = np.char.replace(output_field, encode_ascii('E'), encode_ascii('D'))",
+        "strategy": "plan_solve",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 148.73,
+        "usage": {
+          "tokens_used": 16155
+        }
+      },
+      {
+        "instance_id": "astropy__astropy-7746",
+        "patch": "--- a/astropy/wcs/wcs.py\n+++ b/astropy/wcs/wcs.py\n@@ -1220,6 +1220,10 @@ class WCS(WCSBase, FITSWCSAPIMixin):\n         def _return_list_of_arrays(axes, origin):\n             if ra_dec_order and sky == 'input':\n                 xy = self._denormalize_sky(xy)\n+\n+            if xy.size == 0:\n+                return [np.array([]) for _ in range(self.naxis)]\n+\n             output = func(xy, origin)\n             if ra_dec_order and sky == 'output':\n                 output = self._normalize_sky(output)",
+        "strategy": "plan_solve",
+        "success": true,
+        "error": null,
+        "elapsed_sec": 233.63,
+        "usage": {
+          "tokens_used": 15879
+        }
+      }
+    ]
+  }
+}

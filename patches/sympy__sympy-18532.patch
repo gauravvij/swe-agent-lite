@@ -1,0 +1,38 @@
+diff --git a/sympy/core/basic.py b/sympy/core/basic.py
+--- a/sympy/core/basic.py
++++ b/sympy/core/basic.py
+@@ -503,7 +503,8 @@ class Basic(with_metaclass(ManagedProperties)):
+         """Returns the atoms that form the current object.
+ 
+         By default, only objects that are truly atomic and cannot
+-        be divided into smaller pieces are returned: symbols, numbers,
++        be divided into smaller pieces are returned: objects with
++        no `.args`. This includes symbols, numbers,
+         and number symbols like I and pi. It is possible to request
+         atoms of any type, however, as demonstrated below.
+ 
+@@ -549,15 +550,16 @@ class Basic(with_metaclass(ManagedProperties)):
+         {1/2}
+         """
+         if not types:
+-            types = (Atom,)
+-        else:
+-            types = tuple(
+-                [t if isinstance(t, type) else type(t) for t in types])
+-        result = set()
+-        for expr in preorder_traversal(self):
+-            if isinstance(expr, types):
+-                result.add(expr)
+-        return result
++            return {expr for expr in preorder_traversal(self) if not expr.args}
++        
++        types = tuple(
++            [t if isinstance(t, type) else type(t) for t in types])
++        result = set()
++        for expr in preorder_traversal(self):
++            if isinstance(expr, types):
++                result.add(expr)
++        return result
+ 
+     @property
+     def free_symbols(self):

@@ -1,0 +1,22 @@
+--- a/django/contrib/staticfiles/handlers.py
++++ b/django/contrib/staticfiles/handlers.py
+@@ -1,6 +1,7 @@
+ import asyncio
+ from urllib.parse import urlparse
+ 
++from asgiref.sync import sync_to_async
+ from django.conf import settings
+ from django.contrib.staticfiles import utils
+ from django.contrib.staticfiles.views import serve
+@@ -24,6 +25,13 @@ class StaticFilesHandlerMixin:
+         except Http404 as e:
+             return response_for_exception(request, e)
+ 
++    async def get_response_async(self, request):
++        try:
++            return await sync_to_async(self.serve, thread_sensitive=True)(request)
++        except Http404 as e:
++            return await sync_to_async(response_for_exception)(request, e)
++
+     def _should_handle(self, path):
+         return path.startswith(self.base_url.path) and path != self.base_url.path

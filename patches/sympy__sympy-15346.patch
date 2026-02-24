@@ -1,0 +1,10 @@
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -420,8 +420,8 @@ def trigsimp(expr, **opts):
+     # handle pattern sin(a)*sin(b) + cos(a)*cos(b) -> cos(a-b)
+-    a = Wild('a', exclude=[Number])
+-    b = Wild('b', exclude=[Number])
++    a = Wild('a')
++    b = Wild('b')
+     pattern = sin(a)*sin(b) + cos(a)*cos(b)
+     expr = expr.replace(pattern, cos(a-b))

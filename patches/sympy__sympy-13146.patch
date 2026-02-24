@@ -1,0 +1,11 @@
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -XXX,XXX +XXX,XXX @@
+     expr = signsimp(expr)
++    
++    # Combine terms with float coefficients/exponents that may have
++    # different precisions but represent the same value
++    if expr.is_Add and expr.has(Float):
++        expr = expr.evalf()
++    
+     return expr

@@ -1,0 +1,32 @@
+diff --git a/django/urls/resolvers.py b/django/urls/resolvers.py
+index 9a9c9b9e1f..5c5c5c5c5c 100644
+--- a/django/urls/resolvers.py
++++ b/django/urls/resolvers.py
+@@ -4,6 +4,7 @@ This module converts requested URLs to callback view functions.
+ 
+ RegexURLResolver is the main class here. Its resolve() method takes a URL (as
+ a set of path components separated by slashes) and returns a ResolverMatch.
+ """
++import functools
+ import re
+ import string
+ from importlib import import_module
+@@ -64,9 +65,16 @@ class ResolverMatch:
+     def __init__(self, view, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None, tried=None):
+         self.view_name = view
+         self.url_name = url_name
+-        self.func = view
+-        self.args = args
+-        self.kwargs = kwargs
++        # Unwrap functools.partial objects to get the underlying function
++        # and merge the partial's arguments with the route arguments.
++        if isinstance(view, functools.partial):
++            self.func = view.func
++            self.args = view.args + tuple(args)
++            self.kwargs = {**view.keywords, **dict(kwargs)}
++        else:
++            self.func = view
++            self.args = args
++            self.kwargs = kwargs
+         self.route = route
+         self.tried = tried

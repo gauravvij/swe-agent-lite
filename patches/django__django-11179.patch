@@ -1,0 +1,10 @@
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -277,9 +277,8 @@ class Collector:
+         # update collected instances
+         for model, instances in self.data.items():
+-            if self.dependencies.get(model):
+-                for instance in instances:
+-                    instance.pk = None
++            for instance in instances:
++                instance.pk = None

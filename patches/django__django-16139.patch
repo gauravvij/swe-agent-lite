@@ -1,0 +1,25 @@
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -140,7 +140,7 @@ class UserChangeForm(forms.ModelForm):
+         super().__init__(*args, **kwargs)
+         password = self.fields.get("password")
+         if password:
+-            password.help_text = password.help_text.format("../password/")
++            password.help_text = password.help_text.format(f"../../{self.instance.pk}/password/")
+ 
+     def clean_password(self):
+         # Regardless of what the user provides, return the initial value.
+diff --git a/tests/auth_tests/test_forms.py b/tests/auth_tests/test_forms.py
+--- a/tests/auth_tests/test_forms.py
++++ b/tests/auth_tests/test_forms.py
+@@ -697,6 +697,11 @@ class UserChangeFormTest(TestDataMixin, TestCase):
+         self.assertEqual(form.errors['username'], ['This field is required.'])
+         self.assertEqual(form.errors['password'], ['This field is required.'])
+ 
++    def test_password_help_text_url(self):
++        form = UserChangeForm(instance=self.u1)
++        self.assertIn(f'../../{self.u1.pk}/password/', form.fields['password'].help_text)
++
+ 
+ class PasswordChangeFormTest(TestDataMixin, TestCase):

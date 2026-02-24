@@ -1,0 +1,26 @@
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index 1234567..abcdefg 100644
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1437,7 +1437,7 @@ class LatexPrinter(Printer):
+     _print_UpperGamma = _print_Gamma
+     _print_DirichletEta = _print_zeta
+ 
+-    def _print_SingularityFunction(self, expr):
++    def _print_SingularityFunction(self, expr, **kwargs):
+         shift = self._print(expr.args[0] - expr.args[1])
+         power = self._print(expr.args[2])
+         tex = r"{\left\langle %s \right\rangle}^{%s}" % (shift, power)
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 1234567..abcdefg 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty.py
+@@ -1140,7 +1140,7 @@ class PrettyPrinter(Printer):
+         pform = prettyForm(*pform.left('atan2'))
+         return pform
+ 
+-    def _print_SingularityFunction(self, e):
++    def _print_SingularityFunction(self, e, **kwargs):
+         x = self._print(e.args[0])
+         a = self._print(e.args[1])
+         n = self._print(e.args[2])

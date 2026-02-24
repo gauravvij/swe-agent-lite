@@ -1,0 +1,22 @@
+--- a/src/_pytest/assertion/util.py
++++ b/src/_pytest/assertion/util.py
+@@ -243,9 +243,17 @@ def _compare_eq_sequence(left, right, highlighter):
+         if left[i] != right[i]:
+             explanation += [f"At index {i} diff: {left[i]!r} != {right[i]!r}"]
+             break
+-    if len(left) > len(right):
+-        explanation += [f"Left contains more items, first extra item: {left[len(right)]}"]
+-    elif len(right) > len(left):
+-        explanation += [f"Right contains more items, first extra item: {right[len(left)]}"]
++    len_left, len_right = len(left), len(right)
++    if len_left > len_right:
++        extra = left[len_right]
++        if isinstance(left, bytes):
++            extra = left[len_right:len_right+1]
++        explanation += [f"Left contains more items, first extra item: {extra!r}"]
++    elif len_right > len_left:
++        extra = right[len_left]
++        if isinstance(right, bytes):
++            extra = right[len_left:len_left+1]
++        explanation += [f"Right contains more items, first extra item: {extra!r}"]
+     return explanation

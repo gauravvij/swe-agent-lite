@@ -1,0 +1,11 @@
+--- a/lib/matplotlib/backends/backend_ps.py
++++ b/lib/matplotlib/backends/backend_ps.py
+@@ -529,6 +529,8 @@ class RendererPS(RendererBase):
+         return s
+ 
+     def get_text_width_height_descent(self, s, prop, ismath):
++        if not s:
++            return 0, 0, 0
+         if ismath == 'TeX':
+             # use tex's cache
+             texmanager = self._texmanager

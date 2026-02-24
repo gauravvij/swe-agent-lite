@@ -1,0 +1,39 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -192,11 +192,14 @@ class BaseFormSet:
+ 
+     @property
+     def empty_form(self):
++        # Remove 'empty_permitted' from form_kwargs since empty_form is not
++        # meant to be validated and empty_permitted is explicitly set to True.
++        form_kwargs = self.form_kwargs.copy()
++        form_kwargs.pop('empty_permitted', None)
+         return self.form(
+             auto_id=self.auto_id,
+             prefix=self.add_prefix('__prefix__'),
+             empty_permitted=True,
+-            **self.form_kwargs
++            **form_kwargs
+         )
+ 
+     @property
+diff --git a/tests/forms_tests/tests/test_formsets.py b/tests/forms_tests/tests/test_formsets.py
+--- a/tests/forms_tests/tests/test_formsets.py
++++ b/tests/forms_tests/tests/test_formsets.py
+@@ -450,6 +450,15 @@ class FormsFormsetTestCase(SimpleTestCase):
+         formset = formset_factory(Choice, extra=1)
+         self.assertTrue(formset.empty_form.empty_permitted)
+ 
++    def test_empty_form_with_empty_permitted_in_form_kwargs(self):
++        """
++        empty_form should work even when form_kwargs contains empty_permitted.
++        """
++        formset = formset_factory(Choice, extra=1)
++        formset_instance = formset(form_kwargs={'empty_permitted': True})
++        # This should not raise an error.
++        self.assertTrue(formset_instance.empty_form.empty_permitted)
++
+     def test_formset_with_novalidate(self):
+         """
+         A formset's empty_form is generated with novalidate set to True.

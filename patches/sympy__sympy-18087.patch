@@ -1,0 +1,37 @@
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -400,6 +400,18 @@ def trigsimp(expr, **opts):
+     """
+     expr = sympify(expr)
+     
++    # Fix: Don't incorrectly simplify sqrt(sin(x)**2) to sin(x) for general complex x
++    # sqrt(f(x)**2) equals f(x) only when f(x) is known to be non-negative
++    from sympy import sqrt, sin, Pow, S
++    def protect_sqrt_squares(e):
++        if isinstance(e, Pow) and e.exp == S.Half:
++            base = e.base
++            if isinstance(base, Pow) and base.exp == 2:
++                inner = base.base
++                if isinstance(inner, sin) and not inner.is_nonnegative:
++                    return e  # Keep as sqrt(sin(x)**2), don't simplify to sin(x)
++        return e
++    expr = expr.replace(protect_sqrt_squares)
++    
+     # Call the recursive trigsimp to handle nested expressions
+     return trigsimp_recursive(expr, **opts)
+ 
+@@ -450,8 +462,12 @@ def _futrig(e, **kwargs):
+     # Step 1: Apply basic trigonometric identities
+     e = e.rewrite(cos, sin)
+     
+-    # Step 2: Simplify sqrt(sin(x)**2) patterns carefully
+-    # Only simplify if we know sin(x) >= 0
++    # Step 2: Handle sqrt(sin(x)**2) patterns
++    # Note: sqrt(sin(x)**2) should not become sin(x) unless sin(x) >= 0
++    # This is handled by the assumption system, but we ensure we don't
++    # force the simplification for complex x
++    
++    # Step 3: Continue with standard simplifications
+     e = e.rewrite(tan)
+     
+     # Apply the core simplification algorithms

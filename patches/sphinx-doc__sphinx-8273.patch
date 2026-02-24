@@ -1,0 +1,22 @@
+--- a/sphinx/builders/manpage.py
++++ b/sphinx/builders/manpage.py
+@@ -14,7 +14,7 @@ from sphinx.builders import Builder
+ from sphinx.config import Config
+ from sphinx.locale import __
+ from sphinx.util import logging
+-from sphinx.util.osutil import make_filename
++from sphinx.util.osutil import make_filename, ensuredir
+ from sphinx.util.template import SphinxRenderer
+ from sphinx.writers.manpage import ManualPageWriter
+ 
+@@ -72,7 +72,9 @@ class ManualPageBuilder(Builder):
+     def write(self, *ignored):
+         for info in self.config.man_pages:
+             docname, name, description, authors, section = info
+-            targetname = '%s.%s' % (name, section)
++            sectdir = 'man%s' % section
++            ensuredir(path.join(self.outdir, sectdir))
++            targetname = path.join(sectdir, '%s.%s' % (name, section))
+             logger.info(darkgreen(targetname) + ' { ', nonl=True)
+             destination = FileOutput(
+                 destination_path=path.join(self.outdir, targetname),

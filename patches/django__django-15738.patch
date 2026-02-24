@@ -1,0 +1,22 @@
+--- a/tests/introspection/models.py
++++ b/tests/introspection/models.py
+@@ -58,3 +58,20 @@ class ArticleReporter(models.Model):
+ 
+     class Meta:
+         managed = False
++
++
++class ProjectDataSet(models.Model):
++    name = models.CharField(max_length=50)
++
++
++class Author(models.Model):
++    project_data_set = models.ForeignKey(ProjectDataSet, models.CASCADE)
++    state = models.IntegerField()
++    start_date = models.DateField()
++
++    class Meta:
++        unique_together = (('project_data_set', 'state', 'start_date'),)
++
++    def __str__(self):
++        return "%s %s %s" % (self.project_data_set, self.state, self.start_date)

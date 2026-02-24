@@ -1,0 +1,13 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 1234567..abcdefg 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1111,7 +1111,7 @@ class ModuleDocumenter(Documenter):
+         else:
+             memberlist = self.options.members
+         ret = []
+-        if not memberlist:
++        if memberlist is None:
+             # safe getmembers that ignores the undocumented ones
+             for name in dir(self.object):
+                 try:

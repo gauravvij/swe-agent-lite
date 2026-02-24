@@ -1,0 +1,25 @@
+--- a/django/core/management/commands/inspectdb.py
++++ b/django/core/management/commands/inspectdb.py
+@@ -82,6 +82,13 @@ class Command(BaseCommand):
+                 except NotImplementedError:
+                     constraints = {}
+ 
++                # Count foreign keys to detect multiple references to the same model
++                fk_counts = {}
++                for row in table_description:
++                    if row.name in relations:
++                        ref_table = relations[row.name][0]
++                        fk_counts[ref_table] = fk_counts.get(ref_table, 0) + 1
++
+                 for i, row in enumerate(table_description):
+                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
+                     extra_params = {}  # Holds Field parameters such as 'db_column'.
+@@ -112,6 +119,9 @@ class Command(BaseCommand):
+                         else:
+                             field_type = 'ForeignKey(%s)' % rel_to
+                         extra_params['on_delete'] = 'models.CASCADE'
++                        # Add related_name if there are multiple FKs to the same model
++                        if fk_counts.get(rel_to, 0) > 1:
++                            extra_params['related_name'] = repr(row.name)
+                     else:
+                         # ... (rest of field type detection)

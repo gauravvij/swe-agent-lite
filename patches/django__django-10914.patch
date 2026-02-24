@@ -1,0 +1,12 @@
+diff --git a/django/conf/global_settings.py b/django/conf/global_settings.py
+--- a/django/conf/global_settings.py
++++ b/django/conf/global_settings.py
+@@ -268,6 +268,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
+ # The directory where uploaded files larger than FILE_UPLOAD_MAX_MEMORY_SIZE will be stored.
+ FILE_UPLOAD_TEMP_DIR = None
+ 
++# The numeric mode (i.e. 0o644) to set on newly uploaded files.
++FILE_UPLOAD_PERMISSIONS = 0o644
++
+ # The numeric mode to set on newly created directories.
+ FILE_UPLOAD_DIRECTORY_PERMISSIONS = None

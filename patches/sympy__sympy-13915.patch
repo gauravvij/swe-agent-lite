@@ -1,0 +1,11 @@
+--- a/sympy/core/numbers.py
++++ b/sympy/core/numbers.py
+@@ -2710,7 +2710,7 @@ class ComplexInfinity(AtomicExpr, metaclass=Singleton):
+ 
+     def __truediv__(self, other):
+         if other is S.ComplexInfinity:
+-            return S.One
++            return S.NaN
+         return S.ComplexInfinity
+ 
+     def __abs__(self):

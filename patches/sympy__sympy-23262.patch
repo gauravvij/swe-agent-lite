@@ -1,0 +1,40 @@
+diff --git a/sympy/printing/pycode.py b/sympy/printing/pycode.py
+index 1234567..abcdefg 100644
+--- a/sympy/printing/pycode.py
++++ b/sympy/printing/pycode.py
+@@ -150,6 +150,12 @@ class PythonCodePrinter(AbstractPythonCodePrinter):
+         else:
+             return "%(name)s = %(assign)s" % {'name': lhs, 'assign': rhs}
+ 
++    def _print_Tuple(self, expr):
++        if len(expr) == 1:
++            return "(%s,)" % self._print(expr[0])
++        return "(%s)" % ", ".join(self._print(i) for i in expr)
++
+     def _print_ITE(self, expr):
+         from sympy.functions.elementary.piecewise import Piecewise
+         return self._print(expr.rewrite(Piecewise))
+diff --git a/sympy/utilities/tests/test_lambdify.py b/sympy/utilities/tests/test_lambdify.py
+index 1234567..abcdefg 100644
+--- a/sympy/utilities/tests/test_lambdify.py
++++ b/sympy/utilities/tests/test_lambdify.py
+@@ -180,6 +180,17 @@ def test_lambdify_imps():
+     assert f(2) == 1.5
+ 
+ 
++def test_lambdify_single_element_tuple():
++    # Regression test for issue: Python code printer not respecting tuple with one element
++    f = lambdify([], tuple([1]))
++    # Check that the generated code contains (1,) not just (1)
++    import inspect
++    source = inspect.getsource(f)
++    assert '(1,)' in source
++    # Check that the function actually returns a tuple, not an int
++    result = f()
++    assert isinstance(result, tuple)
++    assert result == (1,)
++
++
+ def test_lambdify_imps_errors():
+     # Test errors for implemented functions
+     f = lambdify(x, sympy_gamma(x), modules='mpmath')

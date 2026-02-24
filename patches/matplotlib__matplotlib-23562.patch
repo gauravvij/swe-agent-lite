@@ -1,0 +1,43 @@
+diff --git a/lib/mpl_toolkits/mplot3d/art3d.py b/lib/mpl_toolkits/mplot3d/art3d.py
+index abc123..def456 100644
+--- a/lib/mpl_toolkits/mplot3d/art3d.py
++++ b/lib/mpl_toolkits/mplot3d/art3d.py
+@@ -633,7 +633,10 @@ class Poly3DCollection(PolyCollection):
+         self.stale = True
+ 
+     def get_facecolors(self):
+-        return self._facecolors2d
++        try:
++            return self._facecolors2d
++        except AttributeError:
++            return super().get_facecolors()
+     get_facecolor = get_facecolors
+ 
+     def get_edgecolors(self):
+-        return self._edgecolors2d
++        try:
++            return self._edgecolors2d
++        except AttributeError:
++            return super().get_edgecolors()
+     get_edgecolor = get_edgecolors
+ 
+     def set_zsort(self, zsort):
+diff --git a/lib/mpl_toolkits/tests/test_mplot3d.py b/lib/mpl_toolkits/tests/test_mplot3d.py
+index abc123..def456 100644
+--- a/lib/mpl_toolkits/tests/test_mplot3d.py
++++ b/lib/mpl_toolkits/tests/test_mplot3d.py
+@@ -1000,3 +1000,13 @@ def test_bar3d_lightsource():
+     # Check that the colors are different when shade=True
+     assert not np.allclose(color1, color2, atol=1e-6)
+     assert not np.allclose(color2, color3, atol=1e-6)
++
++
++def test_poly3dcollection_get_facecolors():
++    # Smoke test to check that get_facecolors works before drawing
++    fig = plt.figure()
++    ax = fig.add_subplot(projection='3d')
++    x, y = np.ogrid[1:10:100j, 1:10:100j]
++    z = np.cos(x)**3 - np.sin(y)**2
++    r = ax.plot_surface(x, y, z, cmap='hot')
++    # This should not raise AttributeError
++    r.get_facecolors()

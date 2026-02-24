@@ -1,0 +1,30 @@
+diff --git a/sklearn/linear_model/logistic.py b/sklearn/linear_model/logistic.py
+--- a/sklearn/linear_model/logistic.py
++++ b/sklearn/linear_model/logistic.py
+@@ -2190,8 +2190,14 @@ def fit(self, X, y, sample_weight=None):
+                     w = np.mean(coefs_paths[:, :, best_indices, :], axis=1)
+                 else:
+-                    w = np.mean([coefs_paths[:, i, best_indices[i], :]
+-                                 for i in range(len(folds))], axis=0)
++                    if coefs_paths.ndim == 3:
++                        # Binary classification case: shape (n_folds, n_Cs, n_features)
++                        w = np.mean([coefs_paths[i, best_indices[i], :]
++                                     for i in range(len(folds))], axis=0)
++                    else:
++                        # Multiclass case: shape (n_classes, n_folds, n_Cs, n_features)
++                        w = np.mean([coefs_paths[:, i, best_indices[i], :]
++                                     for i in range(len(folds))], axis=0)
+ 
+                 best_indices_C = best_indices % len(self.Cs_)
+diff --git a/sklearn/linear_model/tests/test_logistic.py b/sklearn/linear_model/tests/test_logistic.py
+--- a/sklearn/linear_model/tests/test_logistic.py
++++ b/sklearn/linear_model/tests/test_logistic.py
+@@ -1646,3 +1646,15 @@ def test_logistic_regression_path_deprecation():
+     assert_warns_message(FutureWarning, "The logistic_regression_path "
+                          "function is deprecated",
+                          logistic_regression_path, X, y)
++
++
++def test_logistic_regression_cv_refit_false():
++    # Test that LogisticRegressionCV works with refit=False
++    # Non-regression test for issue where IndexError was raised

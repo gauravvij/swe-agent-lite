@@ -1,0 +1,43 @@
+--- a/testing/test_runner.py
++++ b/testing/test_runner.py
+@@ -145,3 +145,42 @@ class TestSetupState:
+         ss.addfinalizer(fin_module, mod)
+         with pytest.raises(ExceptionGroup) as err:
+             ss.teardown_exact(None)
++
++
++class TestModuleLevelSkip:
++    def test_skip_module_level_error_message(self, pytester: Pytester) -> None:
++        """Test that skip at module level suggests allow_module_level in the error."""
++        pytester.makepyfile(
++            test_skip="""
++                import pytest
++                pytest.skip(msg="skip this module")
++                
++                def test_func():
++                    assert True
++            """
++        )
++        result = pytester.runpytest()
++        result.assert_outcomes(errors=1)
++        result.stdout.fnmatch_lines([
++            "*Using pytest.skip outside of a test is not allowed*",
++            "*allow_module_level=True*",
++        ])
++
++    def test_skip_module_function(self, pytester: Pytester) -> None:
++        """Test that pytest.skip_module skips the module."""
++        pytester.makepyfile(
++            test_skip="""
++                import pytest
++                pytest.skip_module("Requires specific condition")
++                
++                def test_func():
++                    assert True
++            """
++        )
++        result = pytester.runpytest()
++        result.assert_outcomes(skipped=1)
++        result.stdout.fnmatch_lines([
++            "*Requires specific condition*",
++        ])

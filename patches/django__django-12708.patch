@@ -1,0 +1,31 @@
+diff --git a/django/db/backends/base/schema.py b/django/db/backends/base/schema.py
+index b3b851c1e7..7792f83899 100644
+--- a/django/db/backends/base/schema.py
++++ b/django/db/backends/base/schema.py
+@@ -364,7 +364,10 @@ class BaseDatabaseSchemaEditor:
+         elif len(fields) > 1:
+             # Find the index name by looking up the constraint on the fields
+             meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+-            columns = [model._meta.get_field(field).column for field in fields]
++            meta_index_names = {constraint.name for constraint in model._meta.indexes}
++            columns = Index(
++                fields=fields, name='__dummy_to_get_columns__'
++            ).get_columns(model._meta)
+             matching_columns_indexes = [
+                 constraint['name'] for constraint in self.connection.introspection.get_constraints(
+                     self.connection.cursor(), model._meta.db_table
+@@ -372,7 +375,13 @@ class BaseDatabaseSchemaEditor:
+                 if (
+                     constraint['index'] and not constraint['unique'] and not constraint['primary_key'] and
+                     constraint['columns'] == columns and
+-                    constraint['name'] not in meta_constraint_names
++                    constraint['name'] not in meta_constraint_names and
++                    # Index names created by the Index class have a
++                    # deterministic name ($table_$col1_$col2_..._$colN_idx).
++                    # Indexes created by index_together are created with the
++                    # _composite index suffix. Use this difference to
++                    # distinguish them from user-defined ones.
++                    not constraint['name'].startswith(model._meta.db_table + '_')
+                 )
+             ]
+             if len(matching_columns_indexes) != 1:

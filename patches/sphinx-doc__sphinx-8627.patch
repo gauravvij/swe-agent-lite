@@ -1,0 +1,10 @@
+--- a/sphinx/util/typing.py
++++ b/sphinx/util/typing.py
+@@ -85,6 +85,9 @@
+         return '.'.join([stringify_annotation(annotation.__origin__),
+                          stringify_annotation(annotation.__args__[0])])
+     else:
++        # Handle regular classes (like struct.Struct) that need module prefix
++        if isinstance(annotation, type):
++            return '%s.%s' % (annotation.__module__, annotation.__qualname__)
+         return str(annotation)

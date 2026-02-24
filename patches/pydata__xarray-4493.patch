@@ -1,0 +1,15 @@
+diff --git a/xarray/core/variable.py b/xarray/core/variable.py
+index 1234567..abcdefg 100644
+--- a/xarray/core/variable.py
++++ b/xarray/core/variable.py
+@@ -100,6 +100,10 @@ def as_variable(obj, name=None):
+             dims, data = obj[0], obj[1]
+             attrs = None
+ 
++        # Avoid eagerly computing dask arrays when data is a DataArray
++        if isinstance(data, DataArray):
++            data = data.variable
++
+         if isinstance(data, Variable):
+             if attrs is not None:
+                 data = data.copy(deep=False)

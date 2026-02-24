@@ -1,0 +1,46 @@
+--- a/sklearn/calibration.py
++++ b/sklearn/calibration.py
+@@ -375,7 +375,7 @@ class _CalibratedClassifier(object):
+                 else:
+                     this_pred = df[:, class_idx]
+ 
+-            proba[:, class_idx] = calibrator.predict(this_pred)
++            proba[:, class_idx] = np.asarray(calibrator.predict(this_pred))
+ 
+         # Normalize probabilities
+         normalizer = proba.sum(axis=1)[:, np.newaxis]
+--- a/sklearn/tests/test_calibration.py
++++ b/sklearn/tests/test_calibration.py
+@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+ from sklearn.svm import LinearSVC
+ from sklearn.pipeline import Pipeline
+ from sklearn.preprocessing import Imputer
++from sklearn import set_config
+ from sklearn.metrics import brier_score_loss, log_loss
+ from sklearn.calibration import CalibratedClassifierCV
+ from sklearn.calibration import _sigmoid_calibration, _SigmoidCalibration
+@@ -21,6 +22,22 @@ from sklearn.calibration import calibration_curve
+ 
+ 
+ @ignore_warnings
++def test_calibration_with_pandas_output():
++    """Test that CalibratedClassifierCV works with pandas output config."""
++    set_config(transform_output="pandas")
++    try:
++        n_samples = 100
++        X, y = make_classification(n_samples=n_samples, n_features=6,
++                                   random_state=42)
++        clf = LinearSVC()
++        pc_clf = CalibratedClassifierCV(clf, method='isotonic', cv=2)
++        pc_clf.fit(X, y)
++        # Should not raise
++        pc_clf.predict(X)
++        pc_clf.predict_proba(X)
++    finally:
++        set_config(transform_output="default")
++
++
++@ignore_warnings
+ def test_calibration():
+     """Test calibration objects with isotonic and sigmoid"""
+     n_samples = 100

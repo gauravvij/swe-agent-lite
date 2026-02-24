@@ -1,0 +1,11 @@
+--- a/sympy/matrices/common.py
++++ b/sympy/matrices/common.py
+@@ -524,7 +524,7 @@ def col_insert(self, pos, other):
+         if pos < 0:
+             pos = self.cols + pos
+         if pos < 0:
+             pos = 0
+         elif pos > self.cols:
+             pos = self.cols
+-        return self[:pos, :].row_join(other).row_join(self[pos:, :])
++        return self[:, :pos].row_join(other).row_join(self[:, pos:])

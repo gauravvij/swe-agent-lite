@@ -1,0 +1,7 @@
+--- a/django/templatetags/static.py
++++ b/django/templatetags/static.py
+@@ -100,6 +100,12 @@ class StaticNode(template.Node):
+ 
+     def render(self, context):
+         url = self.url(context)
++        # Prepend SCRIPT_NAME for relative URLs if

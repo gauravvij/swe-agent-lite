@@ -1,0 +1,9 @@
+diff --git a/requests/sessions.py b/requests/sessions.py
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -...,... @@
+-        method = builtin_str(method)
++        if isinstance(method, bytes) and not isinstance(method, str):
++            method = method.decode('utf-8')
++        else:
++            method = builtin_str(method)

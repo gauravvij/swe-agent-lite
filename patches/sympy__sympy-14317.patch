@@ -1,0 +1,11 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1337,7 +1337,7 @@
+     def _print_Poly(self, expr):
+         from sympy.polys.polytools import Poly
+         if isinstance(expr, Poly):
+-            for monom, coeff in expr.terms():
++            for monom, coeff in sorted(expr.terms(), key=lambda x: x[0], reverse=True):
+                 if coeff != 0:
+                     term = self._print(coeff)
+                     for i, exp in enumerate(monom):

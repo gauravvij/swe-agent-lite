@@ -1,0 +1,6 @@
+--- a/django/db/migrations/serializer.py
++++ b/django/db/migrations/serializer.py
+@@ -1,6 +1,7 @@
+ import collections.abc
+ import datetime
+ import

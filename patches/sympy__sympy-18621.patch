@@ -1,0 +1,14 @@
+--- a/sympy/matrices/dense.py
++++ b/sympy/matrices/dense.py
+@@ -439,6 +439,12 @@ class DenseMatrix(MatrixBase):
+ 
+     @classmethod
+     def _new(cls, *args, **kwargs):
++        # Handle BlockDiagMatrix with single block to avoid indexing issues
++        if len(args) == 1 and hasattr(args[0], 'blocks'):
++            from sympy.matrices.expressions.blockmatrix import BlockDiagMatrix
++            if isinstance(args[0], BlockDiagMatrix) and args[0].blocks.shape == (1, 1):
++                return args[0].blocks[0, 0].as_explicit()
+         rows, cols, flat_list = cls._handle_creation_inputs(*args, **kwargs)
+         self = object.__new__(cls)
+         self._mat = flat_list

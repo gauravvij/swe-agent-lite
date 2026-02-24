@@ -1,0 +1,13 @@
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -85,6 +85,9 @@ class Blueprint(Scaffold):
+         root_path: t.Optional[str] = None,
+         cli_group: t.Union[t.Optional[str], _sentinel] = _sentinel,
+     ) -> None:
++        if "." in name:
++            raise ValueError("Blueprint names may not contain dots.")
++
+         super().__init__(
+             import_name=import_name,
+             static_folder=static_folder,

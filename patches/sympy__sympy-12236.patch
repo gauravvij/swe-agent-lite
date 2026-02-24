@@ -1,0 +1,11 @@
+--- a/sympy/polys/partfrac.py
++++ b/sympy/polys/partfrac.py
+@@ -77,7 +77,7 @@
+     if not Q.has(x):
+         return f
+ 
+-    P = Poly(P, x)
++    P = Poly(P, x, field=True)
+     Q = Poly(Q, x)
+ 
+     if P.is_zero:

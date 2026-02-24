@@ -1,0 +1,11 @@
+--- a/sympy/sets/sets.py
++++ b/sympy/sets/sets.py
+@@ -1260,6 +1260,8 @@ class Intersection(Set):
+     def __new__(cls, *args, **kwargs):
+         evaluate = kwargs.get('evaluate', global_evaluate[0])
+         args = list(sympify(args))
++        # remove duplicates and put in canonical order
++        args = list(ordered(set(args)))
+ 
+         # Reduce sets using known rules
+         if evaluate:

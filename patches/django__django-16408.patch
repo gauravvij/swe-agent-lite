@@ -1,0 +1,21 @@
+--- a/tests/known_related_objects/tests.py
++++ b/tests/known_related_objects/tests.py
+@@ -1,6 +1,7 @@
+ from django.test import TestCase
+ 
+ from .models import Organiser, Pool, PoolStyle, Tournament
++from django.db.models import FilteredRelation
+ 
+ 
+ class ExistingRelatedInstancesTests(TestCase):
+@@ -116,3 +117,10 @@ class ExistingRelatedInstancesTests(TestCase):
+     def test_one_to_one_select_related(self):
+         with self.assertNumQueries(1):
+             ...
++
++    def test_wrong_select_related(self):
++        with self.assertNumQueries(3):
++            p = list(PoolStyle.objects.annotate(
++                tournament_pool=FilteredRelation('pool__tournament__pool'),
++            ).select_related('tournament_pool'))
++            self.assertEqual(p[0].pool.tournament, p[0].tournament_pool.tournament)

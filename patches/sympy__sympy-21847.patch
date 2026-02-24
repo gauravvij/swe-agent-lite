@@ -1,0 +1,16 @@
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -88,12 +88,10 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+     if min_degrees is None:
+         min_degrees = 0
+     
+-    if min_degrees == max_degrees:
+-        for var in variables:
+-            yield var**max_degrees
+-    else:
+-        for deg in range(min_degrees, max_degrees + 1):
+-            for var in variables:
+-                yield var**deg
++    for deg in range(min_degrees, max_degrees + 1):
++        for monom in combinations_with_replacement(variables, deg):
++            yield Mul(*monom)

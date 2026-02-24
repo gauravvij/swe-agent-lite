@@ -1,0 +1,13 @@
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -2828,7 +2828,10 @@ class Figure(FigureBase):
+             self._axstack = _AxesStack()
+             self._axobservers = []
+             # Re-initialize the figure manager.
++            # Preserve DPI since canvas creation may modify it (e.g., on HiDPI displays)
++            dpi = self.dpi
+             mgr = plt._backend_mod.new_figure_manager_given_figure(num, self)
++            self.dpi = dpi
+             self._cachedRenderer = None
+             Gcf._set_new_active_manager(mgr)
+             # Re-initialize the figure manager.

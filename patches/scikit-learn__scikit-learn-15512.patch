@@ -1,0 +1,37 @@
+--- a/sklearn/cluster/affinity_propagation_.py
++++ b/sklearn/cluster/affinity_propagation_.py
+@@ -208,15 +208,25 @@
+     # Identify exemplars
+-    I = np.where(np.diag(A) + np.diag(R) > 0)[0]
+-    K = I.size
+-    if K > 0:
+-        c = np.argmax(S[:, I], axis=1)
+-        c[I] = np.arange(K)
+-        labels = I[c]
+-        # Reduce labels to a sorted, gapless list
+-        cluster_centers_indices = np.unique(labels)
+-        labels = np.searchsorted(cluster_centers_indices, labels)
++    if converged:
++        I = np.where(np.diag(A) + np.diag(R) > 0)[0]
++        K = I.size
++        if K > 0:
++            c = np.argmax(S[:, I], axis=1)
++            c[I] = np.arange(K)
++            labels = I[c]
++            # Reduce labels to a sorted, gapless list
++            cluster_centers_indices = np.unique(labels)
++            labels = np.searchsorted(cluster_centers_indices, labels)
++        else:
++            warnings.warn("No cluster centers found. Consider increasing the "
++                          "preference or setting a smaller damping factor.",
++                          ConvergenceWarning)
++            cluster_centers_indices = np.array([])
++            labels = np.full(n_samples, -1, dtype=int)
+     else:
+-        warnings.warn("No cluster centers found. Consider increasing the "
+-                      "preference or setting a smaller damping factor.",
++        warnings.warn("Affinity propagation did not converge, this model "
++                      "will not have any cluster centers.",
+                       ConvergenceWarning)
+         cluster_centers_indices = np.array([])
+         labels = np.full(n_samples, -1, dtype=int)

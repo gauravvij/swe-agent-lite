@@ -1,0 +1,28 @@
+diff --git a/src/_pytest/junitxml.py b/src/_pytest/junitxml.py
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -10,6 +10,7 @@
+ import os
+ import platform
+ import re
++import socket
+ import sys
+ from datetime import datetime
+ from xml.etree import ElementTree as ET
+@@ -60,6 +61,8 @@ def __init__(self, logfile, prefix, suite_name="pytest", log_passing_tests=Fals
+         self.stats = dict.fromkeys(["error", "skipped", "failure", "passed"], 0)
+         self.node_reporters = {}
+         self.node_reporters_ordered = []
++        self.timestamp = datetime.utcnow().replace(microsecond=0).isoformat()
++        self.hostname = socket.gethostname()
+ 
+     def pytest_sessionfinish(self, session, exitstatus):
+         # ... existing code ...
+@@ -100,6 +103,8 @@ def pytest_sessionfinish(self, session, exitstatus):
+         testsuite.set("failures", str(self.stats["failure"]))
+         testsuite.set("errors", str(self.stats["error"]))
+         testsuite.set("skipped", str(self.stats["skipped"]))
++        testsuite.set("timestamp", self.timestamp)
++        testsuite.set("hostname", self.hostname)
+         testsuite.set("time", "%.3f" % suite_time_delta)
+         testsuite.set("name", self.suite_name)

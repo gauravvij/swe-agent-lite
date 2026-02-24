@@ -1,0 +1,13 @@
+diff --git a/django/db/models/sql/where.py b/django/db/models/sql/where.py
+index 1234567..abcdefg 100644
+--- a/django/db/models/sql/where.py
++++ b/django/db/models/sql/where.py
+@@ -81,7 +81,10 @@ class WhereNode(tree.Node):
+     def as_sql(self, compiler, connection):
+         # ...
+         if not self.children:
+-            return '', []
++            # An empty WHERE clause with AND connector means match everything.
++            # An empty WHERE clause with OR connector means match nothing.
++            return ('1=1', []) if self.connector == AND else ('1=0', [])
+         # ...

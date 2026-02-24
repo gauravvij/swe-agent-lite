@@ -1,0 +1,13 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -118,6 +118,10 @@ class Pipeline(_BaseComposition):
+         self.steps = steps
+         self.memory = memory
+ 
++    def __len__(self):
++        """Returns the length of the Pipeline."""
++        return len(self.steps)
++
+     def fit(self, X, y=None, **fit_params):
+         """Fit the model

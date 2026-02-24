@@ -1,0 +1,14 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -356,7 +356,9 @@
+             if (sql, tuple(params)) in seen:
+                 continue
+             seen.add((sql, tuple(params)))
+-            without_ordering = self.ordering_parts.search(sql).group(1)
++            # Normalize multiline SQL to single line for proper duplicate detection
++            sql_oneline = ' '.join(sql.splitlines())
++            without_ordering = self.ordering_parts.search(sql_oneline).group(1)
+             if (without_ordering, tuple(params)) in seen:
+                 continue
+             seen.add((without_ordering, tuple(params)))

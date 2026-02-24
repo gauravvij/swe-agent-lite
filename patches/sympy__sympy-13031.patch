@@ -1,0 +1,12 @@
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -985,6 +985,9 @@ def reshape(seq, how):
+ 
+     >>> reshape(seq, ((2,), [2])) # etc....
+     """
++    if not seq:
++        return []
++
+     m = sum(flatten(how))
+     n, r = divmod(len(seq), m)
+     if r != 0:

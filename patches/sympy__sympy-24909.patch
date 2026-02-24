@@ -1,0 +1,9 @@
+--- a/sympy/physics/units/prefixes.py
++++ b/sympy/physics/units/prefixes.py
+@@ -83,7 +83,7 @@
+     def __mul__(self, other):
+         from sympy.physics.units.quantities import Quantity
+         if isinstance(other, Quantity):
+-            return other.scale_factor
++            return self.scale_factor * other
+         return Mul(self, other)
